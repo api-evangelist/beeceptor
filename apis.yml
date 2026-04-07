@@ -4,8 +4,7 @@ url: >-
 apis:
   - aid: beeceptor:beeceptor
     name: Beeceptor
-    tags:
-      - API
+    tags: []
     humanURL: https://beeceptor.com/
     properties:
       - url: https://beeceptor.com/
@@ -16,11 +15,11 @@ apis:
       required.
 name: Beeceptor
 tags:
-  - Integrations
   - Automation
-  - Platform
+  - Integrations
   - Mock Servers
   - Mocks
+  - Platform
 type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 access: 3rd-Party
