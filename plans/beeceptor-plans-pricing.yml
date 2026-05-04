@@ -1,0 +1,35 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Beeceptor
+providerId: beeceptor
+created: '2026-05-04'
+modified: '2026-05-04'
+reconciled: true
+tags:
+  - API Mocking
+  - Niche
+description: Beeceptor is a niche API. Free for personal mock APIs (1 endpoint, 50 requests/day). Paid
+  plans from $10/mo.
+sources:
+  - https://beeceptor.com/pricing/
+plans:
+  - id: beeceptor-free
+    name: Free Public API
+    type: freemium
+    description: Free for personal mock APIs (1 endpoint, 50 requests/day). Paid plans from $10/mo.
+    entries:
+      - label: Per request
+        name: request
+        type: metered
+        metric: request
+        limit: -1
+        timeFrame: usage
+        geo: global
+        unit: 1
+        price: '0.00'
+        userMultiplied: false
+    elements:
+      - name: Free for personal / educational / small-scale use
+      - name: May require attribution
+      - name: May have rate limits
