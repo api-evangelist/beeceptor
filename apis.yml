@@ -43,6 +43,8 @@ apis:
       - type: GettingStarted
         url: https://beeceptor.com/docs/
 common:
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/beeceptor
   - type: Website
     url: https://beeceptor.com
   - type: Portal
