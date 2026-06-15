@@ -1,0 +1,1057 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Beeceptor API",
+    "version": "2.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Mock Rules",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get all rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves all mock rules configured for the specified endpoint. Rules define how Beeceptor \nprocesses incoming HTTP requests and generates responses.\n\n**How Rules Work:**\n- Rules are evaluated in a **top-to-bottom order** (first match wins)\n- Each rule contains **conditions** (request matching criteria) and an **action** (response behavior)\n- When a request arrives, Beeceptor evaluates rules sequentially until the first matching rule is found\n- Once matched, the rule's action is executed and no "
+        },
+        {
+          "info": {
+            "name": "Create a new rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates a new mock rule and appends it to the **end of the rule list** (lowest priority). \nThe rule will be evaluated last in the execution order.\n\n**Purpose:**\nA mock rule encapsulates conditions (request matching criteria) and actions (response behavior). \nRules are the core building blocks that define how your mock server responds to incoming requests.\n\n**How It Works:**\n1. **Rule Structure**: Each rule consists of:\n   - `enabled`: Boolean flag to activate/deactivate the rule\n   - `method`: H"
+        },
+        {
+          "info": {
+            "name": "Bulk replace all rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Atomically replaces **all existing rules** with a new set of rules. This is a destructive \noperation that completely overwrites the current rule configuration.\n\n**Purpose:**\n- Sync rules from version control or external systems\n- Restore rules from backup\n- Deploy rule configurations across multiple environments\n- Perform bulk rule updates without individual API calls\n\n**How It Works:**\n1. **Atomic Replacement**: All existing rules are deleted and replaced in a single transaction\n2. **Rule Order"
+        },
+        {
+          "info": {
+            "name": "Delete all rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Permanently deletes **all mock rules** configured for the endpoint. This is a destructive \noperation that cannot be undone.\n\n**Purpose:**\n- Reset endpoint to default state (no custom rules)\n- Clean up before importing new rule configurations\n- Remove all mocking behavior and rely on fallback mechanisms\n\n**Post-Deletion Behavior:**\nAfter all rules are deleted, incoming requests will follow the fallback chain:\n1. **Local Tunnel**: If enabled, requests are forwarded to localhost\n2. **HTTP Proxy**: "
+        },
+        {
+          "info": {
+            "name": "Reorder rules",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules/reorder",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Reorders the existing mock rules by priority without modifying the rule content.\n\n**How It Works:**\n- Provide an ordered list of rule IDs in `order`\n- Rules listed in `order` are moved to the top in the exact sequence provided\n- Any rules not listed keep their relative order and are appended after the reordered block\n\n**Validation:**\n- All rule IDs in `order` must exist for the endpoint\n\n**Use Cases:**\n- Promote a rule to higher priority\n- Restore a known execution order after experiments\n\n**Res"
+        },
+        {
+          "info": {
+            "name": "Get a single rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules/:ruleId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "ruleId",
+                "value": "vshn31wteh",
+                "type": "path",
+                "description": "The unique identifier of the rule (auto-generated during creation)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves the complete configuration of a specific mock rule by its unique identifier.\n\n**Purpose:**\n- Inspect rule details programmatically\n- Verify rule configuration after creation/update\n- Debug rule matching behavior\n\n**Response Format:**\nReturns the complete rule object with:\n- `id`: Unique identifier\n- `enabled`: Active status\n- `method`: HTTP method filter\n- `description`: Human-readable label\n- `conditions`: Array of matching criteria\n- `action`: Response behavior configuration\n\n**Use C"
+        },
+        {
+          "info": {
+            "name": "Update a rule (full replacement)",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules/:ruleId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "ruleId",
+                "value": "vshn31wteh",
+                "type": "path",
+                "description": "The unique identifier of the rule to update."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Performs a **complete replacement** of an existing mock rule. All fields must be provided \nin the request body, as this is not a partial update.\n\n\n**How It Works:**\n1. **Full Replacement**: The entire rule object is replaced with the new configuration\n2. **ID Preservation**: The rule ID remains unchanged (specified in the URL path)\n3. **Position Preservation**: The rule maintains its position in the execution order\n4. **Validation**: The new rule configuration is validated before replacement\n   "
+        },
+        {
+          "info": {
+            "name": "Update a rule (partial)",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules/:ruleId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "ruleId",
+                "value": "vshn31wteh",
+                "type": "path",
+                "description": "The unique identifier of the rule to update."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Performs a **partial update** of an existing mock rule. Only the fields provided in the \nrequest body are modified; all other fields remain unchanged.\n\n**Purpose:**\n- Update specific rule fields without affecting others\n- Toggle rule enabled/disabled status\n- Modify individual conditions or actions\n- Update rule descriptions\n\n**How It Works:**\n1. **Partial Update**: Only specified fields are updated\n2. **Field Merging**: Provided fields overwrite existing values; omitted fields remain unchanged\n"
+        },
+        {
+          "info": {
+            "name": "Delete a rule",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/rules/:ruleId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "ruleId",
+                "value": "vshn31wteh",
+                "type": "path",
+                "description": "The unique identifier of the rule to delete."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Permanently deletes a specific mock rule by its unique identifier. This operation cannot be undone.\n\n**Purpose:**\n- Clean up unused mock configurations\n- Programmatically manage rule lifecycle\n\n**How It Works:**\n1. **Rule Removal**: The rule is removed from the endpoint's rule array\n2. **Order Adjustment**: Remaining rules maintain their relative order\n3. **Priority Shift**: Rules below the deleted rule move up in priority\n4. **Real-time Updates**: Connected dashboard clients are notified.\n\n\n**L"
+        },
+        {
+          "info": {
+            "name": "Upload a blob file",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/blobs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Uploads a binary file (e.g., image, JSON, PDF) to Beeceptor's storage. \nReturns a `blobPath` which can be used in a `MockAction` to serve this file \nas a response. Blobs are automatically managed and deleted by the system.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Request History",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get request history",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "method",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "path",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "behavior",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "ruleMatched",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "isMultipart",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "hasAttachments",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateFrom",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateTo",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateRange",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "requestBody",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "responseBody",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "mode",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves a paginated, searchable list of HTTP requests received by the mock server. Each request log contains metadata about the incoming request, the generated response, and how Beeceptor processed it.\n\n### Purpose\n\nThe Request History API enables:\n- Debugging API integrations by inspecting request/response payloads\n- Auditing API traffic patterns and usage\n- Verifying webhook deliveries and payload contents\n- Analyzing which mock rules matched incoming requests\n\n### How Request Logging Works\n"
+        },
+        {
+          "info": {
+            "name": "Delete request history",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "method",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "path",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "behavior",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "ruleMatched",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateFrom",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateTo",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateRange",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Deletes request history entries with optional filtering. Supports the same filtering parameters as GET, enabling selective bulk deletion of requests matching specific criteria.\n\n ### Purpose\n\n Use this endpoint to:\n - Bulk delete old or irrelevant request logs\n - Remove requests matching specific criteria (method, status, path, etc.)\n - Clean up test data after automated test runs\n\n ### How It Works\n\n 1. **Build Query**: Apply the same filters available in GET to target specific requests\n 2. **E"
+        },
+        {
+          "info": {
+            "name": "Get a single request",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request to retrieve."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves complete details for a specific request by its unique identifier. This endpoint always returns the verbose format with full request and response payloads.\n\n### Purpose\n\nUse this endpoint to:\n- Inspect the full details of a specific request\n- Debug why a particular request succeeded or failed\n- View the exact headers and body sent by the client\n- Examine the response that Beeceptor returned\n- Analyze proxy/callout details if the request was forwarded\n\n### Response Structure\n\nThe respons"
+        },
+        {
+          "info": {
+            "name": "Delete a single request",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request to delete."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Permanently deletes a specific request from the history by its unique identifier. This operation is irreversible.\n\n### Purpose\n\nUse this endpoint to:\n- Remove sensitive requests containing confidential data\n- Clean up test or debug requests\n\n### What Gets Deleted\n\n- The request log entry (metadata, headers, body)\n- Associated response data\n- Callout/proxy details (if applicable)\n- Multipart file metadata (actual files may be retained separately)\n\n### Limitations\n\n- Operation is irreversible; del"
+        },
+        {
+          "info": {
+            "name": "Download multipart file from request",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId/multipart/download",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request containing the file."
+              },
+              {
+                "name": "fieldName",
+                "value": "",
+                "type": "query",
+                "description": "The name of the form field containing the file."
+              },
+              {
+                "name": "component",
+                "value": "",
+                "type": "query",
+                "description": "The component where the file is located (Request or CalloutRequest)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Downloads a file attachment from a multipart/form-data request. This endpoint retrieves the actual file content that was uploaded as part of a request.\n\n### Purpose\n\nUse this endpoint to:\n- Retrieve files uploaded via multipart requests\n- Download attachments for inspection or analysis\n- Export uploaded files for testing or compliance\n- Verify file contents match expected uploads\n\n### How It Works\n\nWhen a multipart/form-data request is received by Beeceptor:\n1. File metadata (field name, file na"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Endpoint Settings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get endpoint settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/settings",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the current settings for the endpoint."
+        },
+        {
+          "info": {
+            "name": "Update endpoint settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/settings",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update specific settings for the endpoint."
+        },
+        {
+          "info": {
+            "name": "Get specification details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns the metadata and current configuration of the uploaded API specification (OAS, WSDL, gRPC, or GraphQL)."
+        },
+        {
+          "info": {
+            "name": "Upload API specification (Async)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                },
+                {
+                  "name": "intelligenceMock",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Uploads an OpenAPI (YAML/JSON), WSDL, GraphQL, or Proto file to automate mock \nresponse generation. This is an asynchronous operation that returns a Job ID.\n"
+        },
+        {
+          "info": {
+            "name": "Delete API specification",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Removes the uploaded API specification and stops any automated mock \nbehaviors tied to it.\n"
+        },
+        {
+          "info": {
+            "name": "Get job status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/jobs/:jobId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "jobId",
+                "value": "job-6a1ed3b07798",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Polls the status of an asynchronous background job using the Job ID returned during a specification upload."
+        },
+        {
+          "info": {
+            "name": "Get all mTLS certificates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Lists all client certificates associated with this endpoint for Mutual TLS."
+        },
+        {
+          "info": {
+            "name": "Add mTLS certificate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Generates a new client certificate and private key for Mutual TLS authentication."
+        },
+        {
+          "info": {
+            "name": "Delete mTLS certificate",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates/:certId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "certId",
+                "value": "6979d6d456c8ed5324860496",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Remove a specific client certificate."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "State Store",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get all state variables",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "limit",
+                "value": "50",
+                "type": "query"
+              },
+              {
+                "name": "offset",
+                "value": "0",
+                "type": "query"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "query"
+              },
+              {
+                "name": "keyPrefix",
+                "value": "cart_",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves a list of all persistent state variables (Counters, Lists, Data Store keys)\ndefined for this endpoint.\n"
+        },
+        {
+          "info": {
+            "name": "Upsert state variables",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Bulk updates or creates state variables."
+        },
+        {
+          "info": {
+            "name": "Delete state items",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Remove specified state variables by their keys."
+        },
+        {
+          "info": {
+            "name": "Get a single state item",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state/:type/:key",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "path"
+              },
+              {
+                "name": "key",
+                "value": "cart_items",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the value of a specific state item."
+        },
+        {
+          "info": {
+            "name": "Delete a single state item",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state/:type/:key",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "path"
+              },
+              {
+                "name": "key",
+                "value": "cart_items",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a specific state item."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
