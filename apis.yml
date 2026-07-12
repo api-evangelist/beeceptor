@@ -39,6 +39,10 @@ apis:
   - url: graphql/beeceptor-graphql.md
     type: GraphQL
 common:
+- type: DomainSecurity
+  url: security/beeceptor-domain-security.yml
+- type: Authentication
+  url: authentication/beeceptor-authentication.yml
 - type: LinkedIn
   url: https://www.linkedin.com/company/beeceptor
 - type: Website
