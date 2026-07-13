@@ -2,11 +2,13 @@
   "repo": "beeceptor",
   "feeds": [
     {
-      "source": "https://beeceptor.com/blog/",
+      "source": "https://beeceptor.com/faq/",
+      "feed_url": "https://beeceptor.com/faq/",
+      "title": "",
       "saved": 0,
-      "error": "HTTP 404 Not Found on /blog/ and /blog"
+      "method": "none"
     }
   ],
   "post_count": 0,
-  "fetched": "2026-06-27T12:27:51Z"
+  "fetched": "2026-07-11T11:50:51Z"
 }
