@@ -39,6 +39,8 @@ apis:
   - url: graphql/beeceptor-graphql.md
     type: GraphQL
 common:
+- type: AgenticAccess
+  url: agentic-access/beeceptor-agentic-access.yml
 - type: DomainSecurity
   url: security/beeceptor-domain-security.yml
 - type: Authentication
