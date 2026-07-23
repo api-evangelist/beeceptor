@@ -1,0 +1,971 @@
+openapi: 3.1.0
+info:
+  title: Beeceptor Endpoint Settings Request History API
+  description: "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n"
+  version: 2.0.0
+  x-release-status: testing
+  x-internal: true
+servers:
+- url: https://api.beeceptor.com/api
+  description: Production API Server
+tags:
+- name: Request History
+paths:
+  /v2/endpoints/{endpoint}/requests:
+    get:
+      summary: Get request history
+      description: 'Retrieves a paginated, searchable list of HTTP requests received by the mock server. Each request log contains metadata about the incoming request, the generated response, and how Beeceptor processed it.
+
+
+        ### Purpose
+
+
+        The Request History API enables:
+
+        - Debugging API integrations by inspecting request/response payloads
+
+        - Auditing API traffic patterns and usage
+
+        - Verifying webhook deliveries and payload contents
+
+        - Analyzing which mock rules matched incoming requests
+
+
+        ### How Request Logging Works
+
+
+        When a request arrives at a Beeceptor endpoint, the following information is captured:
+
+
+        1. **Request Metadata**: HTTP method, path, timestamp, source IP
+
+        2. **Request Details**: Headers, body content, HTTP version
+
+        3. **Processing Information**: Which rule matched (if any), processing time, behavior type
+
+        4. **Response Details**: Status code, headers, body content
+
+        5. **Callout Information**: If the request was proxied, details of the upstream request/response
+
+
+        ### Behavior Types
+
+
+        Each logged request includes a `behavior` field indicating how it was processed:
+
+
+        | Behavior | Description |
+
+        |----------|-------------|
+
+        | `mock-rule` | Matched a user-defined mock rule |
+
+        | `proxy` | Forwarded to upstream proxy target |
+
+        | `callout` | Triggered an HTTP callout (sync or async) |
+
+        | `grpc` | Processed as a gRPC request |
+
+        | `wsdl` | Matched a SOAP/WSDL operation |
+
+        | `graphql` | Processed as a GraphQL request |
+
+        | `tunnel` | Forwarded to local machine via tunnel |
+
+        | `oas` | Generated response from OpenAPI specification |
+
+
+        ### Response Modes
+
+
+        **Compact Mode (Default)**
+
+
+        Returns basic request information optimized for listing and overview:
+
+        - `id`, `date`, `method`, `path`, `status`, `timeTaken`
+
+        - `rule`: Whether a rule matched and which rule ID
+
+        - `behavior`: How the request was processed
+
+
+        **Verbose Mode (`mode=verbose`)**
+
+
+        Returns complete request and response details for debugging:
+
+        - All compact mode fields
+
+        - `request`: Full request body, headers, HTTP version
+
+        - `response`: Full response body, headers, HTTP version
+
+        - `callout`: If proxied, includes target request/response details
+
+        - `multipartData`: Metadata for file uploads (file content available via download endpoint)
+
+
+        ### Pagination
+
+
+        Uses cursor-based pagination for efficient traversal of large datasets:
+
+
+        - Default page size: 20 requests
+
+        - Maximum page size: 100 requests
+
+        - Results are sorted by date descending (newest first)
+
+        - Use the `cursor` from the response to fetch the next page
+
+        - Continue until `pagination.hasMore` is `false`
+
+
+        ### Filtering Capabilities
+
+
+        Multiple filters can be combined to narrow down results:
+
+
+        **Time-Based Filters:**
+
+        - `dateFrom` / `dateTo`: ISO 8601 timestamps for absolute date range
+
+        - `dateRange`: Relative duration (e.g., ''1h'', ''24h'', ''7d'')
+
+
+        **Request Filters:**
+
+        - `method`: HTTP method (GET, POST, PUT, DELETE, PATCH)
+
+        - `path`: Path substring or regex pattern
+
+        - `status`: Response status code (200-599)
+
+        - `requestBody`: Search within request body and multipart field names
+
+        - `responseBody`: Search within response body
+
+
+        **Processing Filters:**
+
+        - `behavior`: How the request was handled
+
+        - `ruleMatched`: Whether a mock rule matched (true/false)
+
+        - `isMultipart`: Requests with file uploads
+
+
+        ### Multipart/Form-Data Handling
+
+
+        For requests containing file uploads:
+
+        - File metadata (field name, file name, content type, size) is included in verbose mode
+
+        - Actual file content is stored separately and available via the download endpoint
+
+        - Search by field name or file name using the `requestBody` filter
+
+
+        ### Data Retention
+
+
+        - Request history is retained for up to **10 days**
+
+        - Older requests are automatically purged
+
+        - Use the DELETE endpoint to manually clean up old requests
+
+
+        ### Sensitive Data Handling
+
+
+        If header masking is enabled in endpoint settings:
+
+        - Sensitive headers (Authorization, API keys, etc.) are redacted
+
+        - `redacted: true` flag indicates data was masked
+
+        '
+      tags:
+      - Request History
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+          description: Maximum number of request logs to return (default 20, max 100).
+      - in: query
+        name: cursor
+        schema:
+          type: string
+          description: Cursor for pagination to fetch the next set of results. Use the cursor from the previous response.
+      - in: query
+        name: id
+        schema:
+          type: string
+          description: Filter by specific request ID (alternative to using the {requestId} path parameter).
+      - in: query
+        name: method
+        schema:
+          type: string
+          description: Filter by HTTP method (e.g., 'GET', 'POST', 'PUT', 'DELETE', 'PATCH').
+      - in: query
+        name: status
+        schema:
+          type: integer
+          description: Filter by HTTP response status code (e.g., 200, 404, 500).
+      - in: query
+        name: path
+        schema:
+          type: string
+          description: Filter by request path substring or regex pattern.
+      - in: query
+        name: behavior
+        schema:
+          type: string
+          enum:
+          - mock-rule
+          - proxy
+          - callout
+          - grpc
+          - wsdl
+          - graphql
+          - tunnel
+          - oas
+          description: Filter by request behavior mode (how the request was handled).
+      - in: query
+        name: ruleMatched
+        schema:
+          type: boolean
+          description: Filter requests that matched (true) or missed (false) user-defined mock rules.
+      - in: query
+        name: isMultipart
+        schema:
+          type: boolean
+          description: Filter requests that contain multipart/form-data content.
+      - in: query
+        name: hasAttachments
+        schema:
+          type: boolean
+          description: Filter requests that have file attachments (alias for isMultipart).
+      - in: query
+        name: dateFrom
+        schema:
+          type: string
+          format: date-time
+          description: Filter requests received after this ISO 8601 timestamp (e.g., 2024-01-15T10:30:00Z).
+      - in: query
+        name: dateTo
+        schema:
+          type: string
+          format: date-time
+          description: Filter requests received before this ISO 8601 timestamp (e.g., 2024-01-15T23:59:59Z).
+      - in: query
+        name: dateRange
+        schema:
+          type: string
+          description: Filter requests within a relative time range (e.g., '1h', '24h', '7d'). Cannot be used with both dateFrom and dateTo.
+      - in: query
+        name: requestBody
+        schema:
+          type: string
+          description: Search for keywords or regex patterns within the request body and multipart field names.
+      - in: query
+        name: responseBody
+        schema:
+          type: string
+          description: Search for keywords or regex patterns within the response body.
+      - in: query
+        name: mode
+        schema:
+          type: string
+          enum:
+          - verbose
+          description: Set to 'verbose' to include full request and response details (headers, body, httpVersion, redaction status). Without this parameter, only basic request information is returned.
+      responses:
+        '200':
+          description: "Request history retrieved successfully. \nResponse format:\n- Without `requestId` path parameter: Returns paginated array with cursor-based pagination\n- With `requestId` path parameter: Returns single RequestLog object directly\n"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/RequestLog'
+                    pagination:
+                      $ref: '#/components/schemas/PaginationNew'
+                  description: Paginated response for request history list
+                - $ref: '#/components/schemas/RequestLog'
+                  description: Single request details when fetched by requestId
+        '400':
+          description: Bad Request - Invalid query parameters or filter values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not Found - Returned when fetching by requestId and request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete request history
+      description: "Deletes request history entries with optional filtering. Supports the same filtering parameters as GET, enabling selective bulk deletion of requests matching specific criteria.\n\n ### Purpose\n\n Use this endpoint to:\n - Bulk delete old or irrelevant request logs\n - Remove requests matching specific criteria (method, status, path, etc.)\n - Clean up test data after automated test runs\n\n ### How It Works\n\n 1. **Build Query**: Apply the same filters available in GET to target specific requests\n 2. **Execute Delete**: All matching requests are permanently deleted\n 3. **Return Count**: Response includes the number of deleted requests\n\n ### Filtering Options\n\n All GET filters are supported for selective deletion:\n\n **Time-Based:**\n - `dateFrom` / `dateTo`: Delete requests within a date range\n - `dateRange`: Delete requests from a relative time period\n\n **Request Attributes:**\n - `method`: Delete requests with specific HTTP method\n - `path`: Delete requests matching path pattern\n - `status`: Delete requests with specific status code\n - `behavior`: Delete requests handled by specific behavior type\n - `ruleMatched`: Delete requests that matched (or didn't match) rules\n\n **Content Search:**\n - `requestBody`: Delete requests containing specific text in body\n - `responseBody`: Delete requests with specific response content\n\n ### Delete All Requests\n\n To delete ALL requests for an endpoint, call this endpoint without any query parameters.\n\n **Warning**: This permanently removes all request history and cannot be undone.\n\n ### Common Deletion Patterns\n\n **Delete requests older than 7 days:**\n ```\n DELETE /requests?dateTo=2024-01-08T00:00:00Z\n ```\n\n **Delete all failed requests (5xx errors):**\n ```\n DELETE /requests?status=500\n ```\n\n **Delete requests from last hour:**\n ```\n DELETE /requests?dateRange=1h\n ```\n\n **Delete requests to a specific path:**\n ```\n DELETE /requests?path=/api/test\n ```\n\n ### Limitations\n\n - Operation is irreversible; deleted requests cannot be recovered\n - Associated multipart files are also deleted\n - Does not affect endpoint configuration, rules, or state\n\n ### Use Cases\n\n - **Post-Test Cleanup**: Remove all requests after a test run completes\n - **Retention Policy**: Automatically delete requests older than N days\n - **Privacy Compliance**: Remove requests containing specific patterns\n"
+      tags:
+      - Request History
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: query
+        name: id
+        schema:
+          type: string
+          description: Delete a specific request by ID (alternative to using the {requestId} path parameter).
+      - in: query
+        name: method
+        schema:
+          type: string
+          description: Delete requests matching this HTTP method.
+      - in: query
+        name: status
+        schema:
+          type: integer
+          description: Delete requests matching this HTTP response status code.
+      - in: query
+        name: path
+        schema:
+          type: string
+          description: Delete requests matching this path substring or regex pattern.
+      - in: query
+        name: behavior
+        schema:
+          type: string
+          enum:
+          - mock-rule
+          - proxy
+          - callout
+          - grpc
+          - wsdl
+          - graphql
+          - tunnel
+          - oas
+          description: Delete requests matching this behavior mode.
+      - in: query
+        name: ruleMatched
+        schema:
+          type: boolean
+          description: Delete requests that matched (true) or missed (false) mock rules.
+      - in: query
+        name: dateFrom
+        schema:
+          type: string
+          format: date-time
+          description: Delete requests received after this ISO 8601 timestamp.
+      - in: query
+        name: dateTo
+        schema:
+          type: string
+          format: date-time
+          description: Delete requests received before this ISO 8601 timestamp.
+      - in: query
+        name: dateRange
+        schema:
+          type: string
+          description: Delete requests within a relative time range (e.g., '1h', '24h', '7d').
+      responses:
+        '200':
+          description: Requests deleted successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  properties:
+                    id:
+                      type: string
+                    deleted:
+                      type: boolean
+                  description: Response when deleting a single request by ID
+                - type: object
+                  properties:
+                    deleted:
+                      type: boolean
+                    count:
+                      type: integer
+                  description: Response when deleting multiple requests via filtering
+        '400':
+          description: Bad Request - Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v2/endpoints/{endpoint}/requests/{requestId}:
+    get:
+      summary: Get a single request
+      description: 'Retrieves complete details for a specific request by its unique identifier. This endpoint always returns the verbose format with full request and response payloads.
+
+
+        ### Purpose
+
+
+        Use this endpoint to:
+
+        - Inspect the full details of a specific request
+
+        - Debug why a particular request succeeded or failed
+
+        - View the exact headers and body sent by the client
+
+        - Examine the response that Beeceptor returned
+
+        - Analyze proxy/callout details if the request was forwarded
+
+
+        ### Response Structure
+
+
+        The response includes all available information about the request:
+
+
+        **Core Fields:**
+
+        - `id`: Unique request identifier
+
+        - `date`: ISO 8601 timestamp when request was received
+
+        - `method`: HTTP method (GET, POST, PUT, DELETE, etc.)
+
+        - `path`: Full request path including query parameters
+
+        - `status`: HTTP response status code returned
+
+        - `timeTaken`: Processing time in milliseconds
+
+
+        **Rule Matching:**
+
+        - `rule.matched`: Boolean indicating if a mock rule matched
+
+        - `rule.ruleId`: ID of the matched rule (if any)
+
+        - `rule.weightedResponse`: Name of selected response (for weighted rules)
+
+
+        **Request Details:**
+
+        - `request.body`: Raw request body content
+
+        - `request.headers`: Object containing all request headers
+
+        - `request.httpVersion`: HTTP version used (e.g., "HTTP/1.1", "HTTP/2")
+
+        - `request.isMultipart`: Boolean for multipart/form-data requests
+
+        - `request.multipartData`: Array of file/field metadata (for multipart requests)
+
+        - `request.redacted`: Boolean indicating if sensitive data was masked
+
+
+        **Response Details:**
+
+        - `response.body`: Raw response body content
+
+        - `response.headers`: Object containing all response headers
+
+        - `response.httpVersion`: HTTP version used
+
+        - `response.blob`: Boolean if response was served from blob storage
+
+        - `response.blobPath`: Path to blob file (if blob response)
+
+        - `response.redacted`: Boolean indicating if sensitive data was masked
+
+
+        **Callout Details (if request was proxied):**
+
+        - `callout.url`: Target URL for the callout
+
+        - `callout.method`: HTTP method used for callout
+
+        - `callout.behavior`: Sync or async callout
+
+        - `callout.delay`: Artificial delay applied (if any)
+
+        - `callout.targetRequest`: Headers and body sent to upstream
+
+        - `callout.targetResponse`: Headers and body received from upstream
+
+
+        **gRPC Requests:**
+
+        For gRPC requests, the structure differs slightly:
+
+        - `request.messages`: Array of gRPC request messages with body, headers, timestamp
+
+        - `response.messages`: Array of gRPC response messages with body, timestamp
+
+
+        ### Use Cases
+
+
+        - **Debugging Integration Issues**: Examine exact payloads when API calls fail
+
+        - **Webhook Verification**: Confirm webhook payloads match expectations
+
+        - **Rule Testing**: Verify that the correct rule matched a request
+
+        - **Proxy Analysis**: Inspect both client and upstream communications
+
+        - **Support Requests**: Share specific request details when reporting issues
+
+        '
+      tags:
+      - Request History
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the request to retrieve.
+      responses:
+        '200':
+          description: Request details (verbose format with full details)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestLogVerbose'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a single request
+      description: 'Permanently deletes a specific request from the history by its unique identifier. This operation is irreversible.
+
+
+        ### Purpose
+
+
+        Use this endpoint to:
+
+        - Remove sensitive requests containing confidential data
+
+        - Clean up test or debug requests
+
+
+        ### What Gets Deleted
+
+
+        - The request log entry (metadata, headers, body)
+
+        - Associated response data
+
+        - Callout/proxy details (if applicable)
+
+        - Multipart file metadata (actual files may be retained separately)
+
+
+        ### Limitations
+
+
+        - Operation is irreversible; deleted requests cannot be recovered
+
+        - Does not affect endpoint configuration, rules, or state
+
+        - Multipart file content may be retained temporarily for other requests
+
+
+        ### Use Cases
+
+
+        - **Test Cleanup**: Delete test requests that clutter the history
+
+        - **Security**: Remove requests with accidentally exposed credentials
+
+        '
+      tags:
+      - Request History
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the request to delete.
+      responses:
+        '200':
+          description: Request deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the deleted request
+                  deleted:
+                    type: boolean
+                    description: Always true on successful deletion
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v2/endpoints/{endpoint}/requests/{requestId}/multipart/download:
+    get:
+      summary: Download multipart file from request
+      description: 'Downloads a file attachment from a multipart/form-data request. This endpoint retrieves the actual file content that was uploaded as part of a request.
+
+
+        ### Purpose
+
+
+        Use this endpoint to:
+
+        - Retrieve files uploaded via multipart requests
+
+        - Download attachments for inspection or analysis
+
+        - Export uploaded files for testing or compliance
+
+        - Verify file contents match expected uploads
+
+
+        ### How It Works
+
+
+        When a multipart/form-data request is received by Beeceptor:
+
+        1. File metadata (field name, file name, content type, size) is stored with the request log
+
+        2. File content is stored separately in binary format
+
+        3. The request history shows file metadata but not content (to keep responses manageable)
+
+        4. This endpoint retrieves the actual file content
+
+
+        ### Required Parameters
+
+
+        Both query parameters are required to identify the specific file:
+
+
+        **fieldName**: The name of the form field containing the file
+
+        - Must match the `name` attribute in the multipart form
+
+        - Example: For `<input type="file" name="document">`, use `fieldName=document`
+
+
+        **component**: Where the file was captured
+
+        - `Request`: File from the incoming client request
+
+        - `CalloutRequest`: File forwarded to an upstream proxy target
+
+
+        ### Response
+
+
+        Returns the raw file content with appropriate headers:
+
+        - `Content-Type`: Original MIME type of the uploaded file
+
+        - `Content-Disposition`: Attachment with original filename
+
+        - `Content-Length`: File size in bytes
+
+
+        ### Finding File Information
+
+
+        To identify which files are available for a request:
+
+        1. Call GET `/requests/{requestId}` (returns verbose format)
+
+        2. Check `request.multipartData` array for file metadata
+
+        3. Use `fieldName` and `fileName` from the metadata
+
+
+        ### Limitations
+
+
+        - Only files (not text fields) can be downloaded
+
+        - File must exist in the request''s multipart data
+
+        - Files are retained for the same duration as request history (up to 10 days)
+
+        - Maximum file size depends on subscription plan
+
+
+        ### Use Cases
+
+
+        - **Debugging File Uploads**: Verify uploaded files match expectations
+
+        - **Compliance Auditing**: Review files submitted through your API
+
+        - **Test Verification**: Confirm test files were received correctly
+
+        - **Data Export**: Extract files for external analysis      tags: [Request History]
+
+        '
+      tags:
+      - Request History
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the request containing the file.
+      - in: query
+        name: fieldName
+        required: true
+        schema:
+          type: string
+        description: The name of the form field containing the file.
+      - in: query
+        name: component
+        required: true
+        schema:
+          type: string
+          enum:
+          - Request
+          - CalloutRequest
+        description: The component where the file is located (Request or CalloutRequest).
+      responses:
+        '200':
+          description: File downloaded successfully
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request - Missing required query parameters (fieldName or component)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    RequestLogCompact:
+      type: object
+      description: Compact request log with basic information only.
+      required:
+      - id
+      - date
+      - method
+      - path
+      - status
+      - timeTaken
+      - rule
+      - behavior
+      properties:
+        id:
+          type: string
+          description: Unique request identifier.
+        date:
+          type: string
+          format: date-time
+          description: Timestamp when the request was received.
+        method:
+          type: string
+          description: HTTP method used (e.g., GET, POST, PUT, DELETE, PATCH, OPTIONS).
+        path:
+          type: string
+          description: Full request path including query parameters.
+        status:
+          type: integer
+          description: HTTP response status code returned by Beeceptor.
+        timeTaken:
+          type: integer
+          description: Processing time in milliseconds.
+        rule:
+          type: object
+          description: Rule matching information.
+          properties:
+            matched:
+              type: boolean
+              description: True if the request matched a user-defined mock rule.
+            ruleId:
+              type: string
+              description: The identifier of the matching rule. Present only when matched is true.
+        behavior:
+          type: string
+          enum:
+          - mock-rule
+          - proxy
+          - crud
+          - grpc
+          description: The behavior mode used to handle this request.
+    PaginationNew:
+      type: object
+      description: Cursor-based pagination metadata for history and state items.
+      properties:
+        cursor:
+          type: string
+          description: The cursor for the next set of results.
+          example: bmV4dF9jdXJzb3JfMTIz
+        hasMore:
+          type: boolean
+          description: Indicates if more records are available.
+          example: true
+        limit:
+          type: integer
+          description: The page size limit used.
+          example: 50
+    RequestLogVerbose:
+      allOf:
+      - $ref: '#/components/schemas/RequestLogCompact'
+      - type: object
+        description: Verbose request log with full request and response details.
+        required:
+        - request
+        - response
+        properties:
+          request:
+            type: object
+            description: Full incoming request details.
+            properties:
+              body:
+                type: string
+                nullable: true
+                description: Request body content, or null if no body was sent.
+              headers:
+                type: object
+                additionalProperties:
+                  type: string
+                description: HTTP headers sent in the request.
+              httpVersion:
+                type: string
+                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
+              redacted:
+                type: boolean
+                description: True if sensitive fields were redacted from the request.
+          response:
+            type: object
+            description: Full response details sent back to the client.
+            properties:
+              body:
+                type: string
+                description: Response body content.
+              headers:
+                type: object
+                additionalProperties:
+                  type: string
+                description: HTTP headers sent in the response.
+              httpVersion:
+                type: string
+                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
+              redacted:
+                type: boolean
+                description: True if sensitive fields were redacted from the response.
+    RequestLog:
+      oneOf:
+      - $ref: '#/components/schemas/RequestLogCompact'
+      - $ref: '#/components/schemas/RequestLogVerbose'
+      description: 'An audit log of an incoming request received by the mock server.
+
+
+        The response format depends on the `mode` query parameter:
+
+        - **Default (compact mode)**: Returns basic request information (id, date, method, path, status, timeTaken, rule, behavior)
+
+        - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
+
+        '
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
+  responses:
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

@@ -1,0 +1,1321 @@
+openapi: 3.1.0
+info:
+  title: Beeceptor Endpoint Settings Mock Rules API
+  description: "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n"
+  version: 2.0.0
+  x-release-status: testing
+  x-internal: true
+servers:
+- url: https://api.beeceptor.com/api
+  description: Production API Server
+tags:
+- name: Mock Rules
+paths:
+  /v2/endpoints/{endpoint}/rules:
+    get:
+      summary: Get all rules
+      description: "Retrieves all mock rules configured for the specified endpoint. Rules define how Beeceptor \nprocesses incoming HTTP requests and generates responses.\n\n**How Rules Work:**\n- Rules are evaluated in a **top-to-bottom order** (first match wins)\n- Each rule contains **conditions** (request matching criteria) and an **action** (response behavior)\n- When a request arrives, Beeceptor evaluates rules sequentially until the first matching rule is found\n- Once matched, the rule's action is executed and no further rules are evaluated\n- If no rules match, Beeceptor falls back to: Local Tunnel → HTTP Proxy → OpenAPI Spec → Default 200 OK response\n\n**Response Format:**\n- Returns all rules (entire rule set)\n- Rules are returned in their execution order (top-to-bottom priority)\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RuleWithId'
+              example:
+                data:
+                - id: 1ua4j6kb1e2
+                  enabled: true
+                  method: GET
+                  description: my simple rule
+                  conditions:
+                  - type: path
+                    operator: equals
+                    value: /simple-rule
+                  action:
+                    type: mock
+                    delay: 0
+                    status: 200
+                    headers:
+                    - key: Content-Type
+                      value: application/json;charset=utf-8
+                    body: "{\n  \"status\": \"Awesome!\"\n}"
+                    templated: false
+                - id: v1ljtxmtiz
+                  enabled: true
+                  method: GET
+                  description: my weighted rule
+                  conditions:
+                  - type: path
+                    operator: equals
+                    value: /weighted-rule
+                  action:
+                    type: weighted
+                    responses:
+                    - name: Response 1
+                      weight: 50
+                      delay: 0
+                      status: 200
+                      headers:
+                      - key: Content-Type
+                        value: application/json;charset=utf-8
+                      body: "{\n  \"status\": \"Sucess Response!\"\n}"
+                      templated: false
+                    - name: Response 2
+                      weight: 50
+                      delay: 0
+                      status: 200
+                      headers:
+                      - key: Content-Type
+                        value: application/json;charset=utf-8
+                      body: "{\n  \"status\": \"Failed response!\"\n}"
+                      templated: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create a new rule
+      description: "Creates a new mock rule and appends it to the **end of the rule list** (lowest priority). \nThe rule will be evaluated last in the execution order.\n\n**Purpose:**\nA mock rule encapsulates conditions (request matching criteria) and actions (response behavior). \nRules are the core building blocks that define how your mock server responds to incoming requests.\n\n**How It Works:**\n1. **Rule Structure**: Each rule consists of:\n   - `enabled`: Boolean flag to activate/deactivate the rule\n   - `method`: HTTP method to match (GET, POST, PUT, DELETE, etc., or '*' for any)\n   - `conditions`: Array of 1-5 matching criteria (ALL must match for the rule to trigger)\n   - `action`: The behavior to execute when conditions match (mock response, proxy, CRUD, etc.)\n   - `description`: Optional human-readable label for rule management\n\n2. **Condition Matching (AND Logic)**:\n   - All conditions in a rule must match for the rule to qualify\n   - Supported condition types: equals, starts_with, contains, regex, template, header, body, body_param, state, graphql, soap_action\n   - Conditions can match against request data or state store variables\n   - Path conditions support regex with named groups for extracting path parameters\n\n3. **Rule Execution Order**:\n   - Rules are evaluated **top-to-bottom** (first match wins)\n   - New rules created via this API are inserted at the **bottom** (lowest priority)\n   - To change priority, use the reorder endpoint or drag-and-drop in the UI\n   - Once a rule matches, its action executes and no further rules are evaluated\n\n4. **Action Types**:\n   - `mock`: Return a predefined HTTP response (static or templated)\n   - `weighted`: Randomly select from multiple responses based on probability weights\n   - `callout`: Forward request to external API (sync proxy or async webhook)\n   - `crud`: Enable automatic CRUD operations for a resource\n   - `grpc`: Mock gRPC responses (unary or streaming)\n\n**Limitations:**\n- Maximum 5 conditions per rule\n- For OR logic, create multiple rules with different conditions\n- Rule IDs are auto-generated and cannot be specified\n- Rules cannot be inserted at a specific position (always appended to the end)\n\n**Best Practices:**\n- Place specific/narrow rules at the top (higher priority)\n- Place broad/catch-all rules at the bottom (lower priority)\n- Use descriptive names in the `description` field for easier management\n- Test rule matching using the dashboard's request history API\n- Use state conditions for stateful mock scenarios (e.g., login flows)\n\n\n**Response:**\nReturns the created rule with its auto-generated `id` field.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleWithId'
+              example:
+                id: vshn31wteh
+                enabled: true
+                method: GET
+                description: my simple rule
+                conditions:
+                - type: path
+                  operator: equals
+                  value: /simple-rule
+                action:
+                  type: mock
+                  delay: 0
+                  status: 200
+                  headers:
+                  - key: Content-Type
+                    value: application/json;charset=utf-8
+                  body: "{\n  \"status\": \"Awesome!\"\n}"
+                  templated: false
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      summary: Bulk replace all rules
+      description: "Atomically replaces **all existing rules** with a new set of rules. This is a destructive \noperation that completely overwrites the current rule configuration.\n\n**Purpose:**\n- Sync rules from version control or external systems\n- Restore rules from backup\n- Deploy rule configurations across multiple environments\n- Perform bulk rule updates without individual API calls\n\n**How It Works:**\n1. **Atomic Replacement**: All existing rules are deleted and replaced in a single transaction\n2. **Rule Order Preservation**: Rules are stored and executed in the order provided in the array\n3. **Validation**: All rules are validated before replacement (if any rule is invalid, the entire operation fails)\n\n**Validation Rules:**\n- Each rule must have valid `enabled`, `conditions`, and `action` fields\n- Conditions array must contain 1-5 items\n- All condition types must be valid (path, header, body, etc.)\n- Action type must be one of: mock, weighted, callout, crud, grpc\n- For weighted actions, response weights must sum to exactly 100\n\n**Limitations:**\n- Maximum rules per endpoint: 500 \n- Request body size limit: 1MB\n\n\n**Use Cases:**\n- **CI/CD Integration**: Deploy rules as part of automated pipelines\n- **Environment Sync**: Copy production rules to staging/dev environments\n- **Backup/Restore**: Periodically backup rules and restore when needed\n- **Bulk Updates**: Modify multiple rules offline and push all changes at once\n\n**Response:**\nReturns the count of replaced rules on success.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Rules replaced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  replaced:
+                    type: integer
+              example:
+                replaced: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      summary: Delete all rules
+      description: "Permanently deletes **all mock rules** configured for the endpoint. This is a destructive \noperation that cannot be undone.\n\n**Purpose:**\n- Reset endpoint to default state (no custom rules)\n- Clean up before importing new rule configurations\n- Remove all mocking behavior and rely on fallback mechanisms\n\n**Post-Deletion Behavior:**\nAfter all rules are deleted, incoming requests will follow the fallback chain:\n1. **Local Tunnel**: If enabled, requests are forwarded to localhost\n2. **HTTP Proxy**: If configured, requests are proxied to the target URL\n3. **OpenAPI Spec**: If uploaded, responses are generated from the spec\n4. **Default Response**: Returns `200 OK` with a default message\n\n**Limitations:**\n- This operation is irreversible.\n- Does not affect other endpoint settings (CORS, rate limits, etc.)\n\n**Best Practices:**\n- Export/backup rules before deletion (use GET /rules endpoint)\n- Consider disabling rules instead of deleting if you may need them later\n- Verify the endpoint name before executing this operation\n\n**Response:**\nReturns the count of deleted rules and a success flag.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: Rules deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                  count:
+                    type: integer
+              example:
+                deleted: true
+                count: 5
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v2/endpoints/{endpoint}/rules/reorder:
+    post:
+      summary: Reorder rules
+      description: 'Reorders the existing mock rules by priority without modifying the rule content.
+
+
+        **How It Works:**
+
+        - Provide an ordered list of rule IDs in `order`
+
+        - Rules listed in `order` are moved to the top in the exact sequence provided
+
+        - Any rules not listed keep their relative order and are appended after the reordered block
+
+
+        **Validation:**
+
+        - All rule IDs in `order` must exist for the endpoint
+
+
+        **Use Cases:**
+
+        - Promote a rule to higher priority
+
+        - Restore a known execution order after experiments
+
+
+        **Response:**
+
+        Returns the count of rules that were reordered.
+
+        '
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - order
+              properties:
+                order:
+                  type: array
+                  description: Ordered list of rule IDs to move to the top.
+                  items:
+                    type: string
+            example:
+              order:
+              - vshn31wteh
+              - 1ua4j6kb1e2
+      responses:
+        '200':
+          description: Rules reordered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      reordered:
+                        type: integer
+              example:
+                data:
+                  reordered: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v2/endpoints/{endpoint}/rules/{ruleId}:
+    get:
+      summary: Get a single rule
+      description: 'Retrieves the complete configuration of a specific mock rule by its unique identifier.
+
+
+        **Purpose:**
+
+        - Inspect rule details programmatically
+
+        - Verify rule configuration after creation/update
+
+        - Debug rule matching behavior
+
+
+        **Response Format:**
+
+        Returns the complete rule object with:
+
+        - `id`: Unique identifier
+
+        - `enabled`: Active status
+
+        - `method`: HTTP method filter
+
+        - `description`: Human-readable label
+
+        - `conditions`: Array of matching criteria
+
+        - `action`: Response behavior configuration
+
+
+        **Use Cases:**
+
+        - Retrieve rule details before updating
+
+        - Verify rule configuration in automated tests
+
+        '
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the rule (auto-generated during creation).
+        example: vshn31wteh
+      responses:
+        '200':
+          description: Rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleWithId'
+              example:
+                id: vshn31wteh
+                enabled: true
+                method: GET
+                description: my simple rule
+                conditions:
+                - type: path
+                  operator: equals
+                  value: /simple-rule
+                action:
+                  type: mock
+                  delay: 0
+                  status: 200
+                  headers:
+                  - key: Content-Type
+                    value: application/json;charset=utf-8
+                  body: "{\n  \"status\": \"Awesome!\"\n}"
+                  templated: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: Update a rule (full replacement)
+      description: "Performs a **complete replacement** of an existing mock rule. All fields must be provided \nin the request body, as this is not a partial update.\n\n\n**How It Works:**\n1. **Full Replacement**: The entire rule object is replaced with the new configuration\n2. **ID Preservation**: The rule ID remains unchanged (specified in the URL path)\n3. **Position Preservation**: The rule maintains its position in the execution order\n4. **Validation**: The new rule configuration is validated before replacement\n        \n**Limitations:**\n- Cannot move the rule to a different position (use reorder endpoint)\n- All validation rules apply (same as rule creation)\n- Partial updates not supported (use PATCH for partial updates)\n\n**Use Cases:**\n- Update response templates based on external data\n- Modify conditions to match new API contracts\n- Change action types (e.g., mock → callout)\n- Update weighted response probabilities\n\n**Response:**\nReturns the updated rule with all fields.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the rule to update.
+        example: vshn31wteh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleWithId'
+              example:
+                id: vshn31wteh
+                enabled: true
+                method: GET
+                description: my simple rule
+                conditions:
+                - type: path
+                  operator: equals
+                  value: /simple-rule
+                action:
+                  type: mock
+                  delay: 0
+                  status: 200
+                  headers:
+                  - key: Content-Type
+                    value: application/json;charset=utf-8
+                  body: "{\n  \"status\": \"Awesome!\"\n}"
+                  templated: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a rule (partial)
+      description: "Performs a **partial update** of an existing mock rule. Only the fields provided in the \nrequest body are modified; all other fields remain unchanged.\n\n**Purpose:**\n- Update specific rule fields without affecting others\n- Toggle rule enabled/disabled status\n- Modify individual conditions or actions\n- Update rule descriptions\n\n**How It Works:**\n1. **Partial Update**: Only specified fields are updated\n2. **Field Merging**: Provided fields overwrite existing values; omitted fields remain unchanged\n3. **ID Preservation**: The rule ID cannot be changed\n4. **Position Preservation**: The rule maintains its position in the execution order\n5. **Validation**: Updated fields are validated before applying changes\n\n**Supported Partial Updates:**\n- `enabled`: Toggle rule on/off without changing conditions or actions\n- `description`: Update the human-readable label\n- `method`: Change the HTTP method filter\n- `conditions`: Replace the entire conditions array\n- `action`: Replace the entire action object\n\n**Important Notes:**\n- Complex fields like `conditions` and `action` are replaced entirely (not merged)\n- To update a single condition, you must provide the complete `conditions` array\n- To update action properties, you must provide the complete `action` object\n- Partial updates within nested objects are not supported\n\n**Common Use Cases:**\n\n**Example 1: Toggle Rule Status**\n```json\n{\n  \"enabled\": false\n}\n```\nDisables the rule without modifying conditions or actions.\n\n**Example 2: Update Description**\n```json\n{\n  \"description\": \"Updated rule description\"\n}\n```\nChanges only the rule's label.\n\n**Example 3: Change HTTP Method**\n```json\n{\n  \"method\": \"POST\"\n}\n```\nUpdates the method filter while preserving conditions and actions.\n\n**Limitations:**\n- Cannot move the rule to a different position\n- Nested object merging not supported (entire objects must be replaced)\n- All validation rules apply to updated fields\n        \n**Response:**\nReturns the complete updated rule with all fields (including unchanged ones).\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the rule to update.
+        example: vshn31wteh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleWithId'
+              example:
+                id: vshn31wteh
+                enabled: true
+                method: GET
+                description: my simple rule
+                conditions:
+                - type: path
+                  operator: equals
+                  value: /simple-rule
+                action:
+                  type: mock
+                  delay: 0
+                  status: 200
+                  headers:
+                  - key: Content-Type
+                    value: application/json;charset=utf-8
+                  body: "{\n  \"status\": \"Awesome!\"\n}"
+                  templated: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a rule
+      description: "Permanently deletes a specific mock rule by its unique identifier. This operation cannot be undone.\n\n**Purpose:**\n- Clean up unused mock configurations\n- Programmatically manage rule lifecycle\n\n**How It Works:**\n1. **Rule Removal**: The rule is removed from the endpoint's rule array\n2. **Order Adjustment**: Remaining rules maintain their relative order\n3. **Priority Shift**: Rules below the deleted rule move up in priority\n4. **Real-time Updates**: Connected dashboard clients are notified.\n\n\n**Limitations:**\n- Operation is irreversible.\n- Deleted rules cannot be recovered unless backed up externally\n- Does not affect other endpoint settings or rules\n\n**Best Practices:**\n- Backup the rule before deletion (use GET /rules/{ruleId})\n- Consider disabling the rule first to test impact before permanent deletion\n- Verify the rule ID before executing this operation\n- Review remaining rules to ensure correct execution order after deletion\n        \n**Use Cases:**\n- Remove temporary test rules after testing\n- Clean up rules after API contract changes\n- Delete duplicate or conflicting rules\n- Programmatic rule lifecycle management in CI/CD pipelines\n\n**Response:**\nReturns the deleted rule ID and a success flag.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: ruleId
+        required: true
+        schema:
+          type: string
+        description: The unique identifier of the rule to delete.
+        example: vshn31wteh
+      responses:
+        '200':
+          description: Rule deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  deleted:
+                    type: boolean
+              example:
+                id: vshn31wteh
+                deleted: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v2/endpoints/{endpoint}/blobs:
+    post:
+      summary: Upload a blob file
+      description: "Uploads a binary file (e.g., image, JSON, PDF) to Beeceptor's storage. \nReturns a `blobPath` which can be used in a `MockAction` to serve this file \nas a response. Blobs are automatically managed and deleted by the system.\n"
+      tags:
+      - Mock Rules
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload.
+      responses:
+        '201':
+          description: Blob uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blobPath:
+                    type: string
+                    description: The identifier for the uploaded blob (e.g., res-body-20260120062822-u70ynu7gyy.yml).
+              example:
+                blobPath: res-body-20260121042538-e53mertosm.json
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          description: Internal server error - failed to upload blob.
+components:
+  responses:
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad Request - Payload validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    CrudAction:
+      type: object
+      description: 'Enables stateful CRUD behavior for a resource path. Beeceptor will automatically
+
+        handle POST (Create), GET (Read), PUT (Update), and DELETE operations for JSON objects.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - crud
+          example: crud
+        idField:
+          type: string
+          description: The field name in the JSON object used as a unique identifier (e.g., 'id' or 'uuid').
+          example: id
+      required:
+      - type
+      - idField
+    CalloutAction:
+      type: object
+      description: 'Triggers an external HTTP request (Callout) when the rule matches.
+
+        This is useful for proxying traffic, transforming payloads, or notifying webhooks.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - callout
+          example: callout
+        behavior:
+          type: string
+          enum:
+          - sync
+          - async
+          description: "'sync': The original request waits for the target service's response (Proxy behavior).\n'async': Beeceptor sends an immediate response to the client and triggers \nthe callout as a background process (Webhook behavior).\n"
+          example: sync
+        callout:
+          type: object
+          description: Detailed configuration for the outgoing request.
+          properties:
+            url:
+              type: string
+              description: The destination URL (Target) for the callout.
+              example: https://echo.beeceptor.com
+            method:
+              type: string
+              enum:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+              - TRACE
+              - '*'
+              example: POST
+            transform:
+              type: string
+              enum:
+              - forward
+              - custom
+              description: '''forward'': Pass the target''s response back to the client as-is.
+
+                ''custom'': Return a pre-defined mock response to the client instead of the target''s response.
+
+                '
+              example: forward
+            headers:
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    example: X-Forwarded-For
+                  value:
+                    type: string
+                    example: beeceptor
+                  templated:
+                    type: boolean
+                    example: false
+            body:
+              type: string
+              example: '{"action": "proxy"}'
+            templated:
+              type: boolean
+              example: false
+            connectionId:
+              type: string
+              description: 'Reference ID of an API Connection (configured in Beeceptor) to handle
+
+                OAuth 2.0 or other authentication methods automatically.
+
+                '
+              example: conn_12345
+            delay:
+              type: object
+              properties:
+                min:
+                  type: number
+                  example: 100
+                max:
+                  type: number
+                  example: 500
+        status:
+          type: number
+          description: HTTP status for the immediate mock response (async behavior only).
+          minimum: 100
+          maximum: 599
+          example: 202
+        headers:
+          type: array
+          description: HTTP headers for the immediate mock response (async behavior only).
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: Content-Type
+              value:
+                type: string
+                example: application/json
+              templated:
+                type: boolean
+                example: false
+        body:
+          type: string
+          description: HTTP body for the immediate mock response (async behavior only).
+          example: '{"status": "accepted"}'
+        templated:
+          type: boolean
+          example: false
+      required:
+      - type
+      - behavior
+      - callout
+    GrpcResponse:
+      type: object
+      properties:
+        body:
+          type: string
+          example: '{"message": "Hello from Beeceptor"}'
+        metadata:
+          type: string
+          example: '{"some-key": "some-value"}'
+    BodyCondition:
+      description: Performs a search or pattern match against the raw HTTP request body.
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - body
+            example: body
+          operator:
+            type: string
+            enum:
+            - contains
+            - regex
+            description: Matching operator for the raw body content.
+            example: contains
+          value:
+            type: string
+            description: The text or regex pattern to look for in the body.
+            example: username
+        required:
+        - operator
+        - value
+    RuleWithId:
+      description: 'A Rule object that includes a unique identifier, typically returned in responses.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/Rule'
+      - type: object
+        required:
+        - id
+        properties:
+          id:
+            type: string
+            description: The unique identifier for the rule.
+    WeightedAction:
+      type: object
+      description: 'Distributes incoming requests across multiple responses based on assigned weights.
+
+        The combined weights of all responses must equal exactly 100.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - weighted
+          example: weighted
+        responses:
+          type: array
+          description: A list of potential responses and their probability weights.
+          items:
+            $ref: '#/components/schemas/WeightedResponse'
+      required:
+      - type
+      - responses
+    Rule:
+      type: object
+      description: 'A Rule defines the behavior for an incoming request. It consists of a set of conditions
+
+        and a resulting action. Beeceptor matches requests against rules in the order they are defined.
+
+        '
+      required:
+      - enabled
+      - conditions
+      - action
+      properties:
+        enabled:
+          type: boolean
+          description: Toggle rule on/off. Disabled rules are ignored during matching.
+          example: true
+        method:
+          type: string
+          enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+          - TRACE
+          - '*'
+          description: 'The HTTP method to match. Use ''*'' to match any method.
+
+            Note: For CRUD and gRPC rules, this is typically set to ''*''.
+
+            '
+          example: POST
+        description:
+          type: string
+          description: Optional human-readable description for managing rules.
+          example: My simple mock rule
+        conditions:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Condition'
+          description: 'An array of conditions that must all match (AND logic) for the rule to trigger.
+
+            Rules are evaluated in order; the first fully matched rule executes.
+
+            '
+        action:
+          description: The action to perform (e.g., Mock, Proxy, CRUD) when conditions match.
+          allOf:
+          - $ref: '#/components/schemas/Action'
+    Condition:
+      oneOf:
+      - $ref: '#/components/schemas/PathCondition'
+      - $ref: '#/components/schemas/HeaderCondition'
+      - $ref: '#/components/schemas/BodyCondition'
+      - $ref: '#/components/schemas/BodyParamCondition'
+      - $ref: '#/components/schemas/StateCondition'
+      - $ref: '#/components/schemas/GraphQLCondition'
+      - $ref: '#/components/schemas/SoapActionCondition'
+      - $ref: '#/components/schemas/GrpcMethodCondition'
+      discriminator:
+        propertyName: type
+        mapping:
+          path: '#/components/schemas/PathCondition'
+          header: '#/components/schemas/HeaderCondition'
+          body: '#/components/schemas/BodyCondition'
+          body_param: '#/components/schemas/BodyParamCondition'
+          state: '#/components/schemas/StateCondition'
+          graphql: '#/components/schemas/GraphQLCondition'
+          soap_action: '#/components/schemas/SoapActionCondition'
+          grpc_method: '#/components/schemas/GrpcMethodCondition'
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
+    PathCondition:
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - path
+            example: path
+          operator:
+            type: string
+            enum:
+            - equals
+            - starts_with
+            - contains
+            - regex
+            - template
+            description: "Matching operator. 'template' allows Express.js-style path syntax \n(e.g., /users/:id) to capture variables.\n"
+            example: equals
+          value:
+            type: string
+            description: The path string or pattern to match against.
+            example: /api/login
+        required:
+        - operator
+        - value
+    GraphQLCondition:
+      description: "Matches against incoming GraphQL queries. Beeceptor parses the GraphQL operation \nname or query structure to determine a match.\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - graphql
+            example: graphql
+          operator:
+            type: string
+            enum:
+            - equals
+            - contains
+            - regex
+            example: equals
+          value:
+            type: string
+            description: The GraphQL operation name or query snippet to match.
+            example: GetUserEmail
+        required:
+        - operator
+        - value
+    SoapActionCondition:
+      description: Targets SOAP-based web services by matching against the 'SOAPAction' header.
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - soap_action
+            example: soap_action
+          operator:
+            type: string
+            enum:
+            - equals
+            example: equals
+          value:
+            type: string
+            description: The exact SOAPAction URI or string to match.
+            example: http://www.example.org/GetUser
+        required:
+        - operator
+        - value
+    GrpcMethodCondition:
+      description: "Primary condition for gRPC rules. Matches the full gRPC method path \n(e.g., 'package.Service/MethodName').\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - grpc_method
+            example: grpc_method
+          value:
+            type: string
+            description: The fully qualified gRPC method name.
+            example: user.UserService/GetUser
+        required:
+        - value
+    Action:
+      oneOf:
+      - $ref: '#/components/schemas/MockAction'
+      - $ref: '#/components/schemas/WeightedAction'
+      - $ref: '#/components/schemas/CalloutAction'
+      - $ref: '#/components/schemas/CrudAction'
+      - $ref: '#/components/schemas/GrpcAction'
+      discriminator:
+        propertyName: type
+        mapping:
+          mock: '#/components/schemas/MockAction'
+          weighted: '#/components/schemas/WeightedAction'
+          callout: '#/components/schemas/CalloutAction'
+          crud: '#/components/schemas/CrudAction'
+          grpc: '#/components/schemas/GrpcAction'
+    StateCondition:
+      description: 'Matches against persistent state variables (Counters, Data Stores, or Lists)
+
+        stored in your endpoint. This allows for stateful mock transitions.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - state
+            example: state
+          key:
+            type: string
+            description: The name of the state variable.
+            example: login_attempts
+          stateType:
+            type: string
+            enum:
+            - string
+            - counter
+            - list
+            description: '''string'': General key-value store.
+
+              ''counter'': Numeric value supporting math operations.
+
+              ''list'': Collection of values supporting LIFO/FIFO operations.
+
+              '
+            example: counter
+          operator:
+            type: string
+            enum:
+            - equals
+            - not_equals
+            - contains
+            - not_contains
+            - greater_than
+            - less_than
+            - greater_than_equal
+            - less_than_equal
+            example: greater_than
+          value:
+            type: string
+            description: The value to compare the current state against.
+            example: '3'
+        required:
+        - key
+        - stateType
+        - operator
+        - value
+    HeaderCondition:
+      description: Inspects the value of a specific HTTP header in the incoming request.
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - header
+            example: header
+          key:
+            type: string
+            description: The name of the HTTP header (e.g., 'User-Agent', 'X-Custom-Header').
+            example: Content-Type
+          operator:
+            type: string
+            enum:
+            - equals
+            - contains
+            - regex
+            description: Matching operator for the header value.
+            example: equals
+          value:
+            type: string
+            description: The expected string, substring, or regular expression pattern.
+            example: application/json
+        required:
+        - key
+        - operator
+        - value
+    GrpcAction:
+      type: object
+      description: Defines the mock behavior for gRPC calls, supporting unary and streaming communication.
+      properties:
+        type:
+          type: string
+          enum:
+          - grpc
+          example: grpc
+        callType:
+          type: string
+          enum:
+          - unary
+          - server_streaming
+          - client_streaming
+          - bidirectional_streaming
+          description: gRPC communication pattern.
+          example: unary
+        status:
+          type: number
+          minimum: 0
+          description: Standard gRPC status code (0 for OK, 1-16 for errors).
+          example: 0
+        statusMessage:
+          type: string
+          description: Human-readable status message for gRPC errors, only applicable for non-zero status codes.
+          example: something went wrong
+        delay:
+          type: number
+          minimum: 0
+          maximum: 600000
+          description: Delay before sending the first response in milliseconds.
+          example: 0
+        responses:
+          type: array
+          minItems: 1
+          maxItems: 4
+          description: 'A list of responses to send back. For streaming calls, these are sent sequentially.
+
+            If ''singleResponseRepeated'' is true, only the first response is used for all streams.
+
+            '
+          items:
+            $ref: '#/components/schemas/GrpcResponse'
+        streamCount:
+          type: object
+          description: "For server_streaming or bidirectional patterns, controls how many times \nthe server will push messages before finishing.\n"
+          properties:
+            min:
+              type: number
+              minimum: 1
+              description: Minimum number of stream messages to send.
+              example: 1
+            max:
+              type: number
+              minimum: 1
+              description: Maximum number of stream messages to send.
+              example: 5
+        singleResponseRepeated:
+          type: boolean
+          description: "If true, the server repeats the first response item for the entire duration \nof the stream. If false, you must provide a list of unique responses.\n"
+          example: true
+      required:
+      - type
+      - callType
+      - responses
+    BaseCondition:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+    MockAction:
+      type: object
+      description: Returns a predefined HTTP response to the caller.
+      properties:
+        type:
+          type: string
+          enum:
+          - mock
+          example: mock
+        delay:
+          type: number
+          description: Response delay in milliseconds (0-600,000).
+          minimum: 0
+          maximum: 600000
+          example: 200
+        status:
+          type: number
+          description: HTTP status code to return.
+          minimum: 100
+          maximum: 599
+          example: 200
+        headers:
+          type: array
+          description: Custom HTTP headers to include in the response.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: Content-Type
+              value:
+                type: string
+                example: application/json
+              templated:
+                type: boolean
+                description: Enable template engine for this header value.
+                example: false
+        templated:
+          type: boolean
+          description: "If enabled, Beeceptor processes the body using its powerful template engine, \nallowing for dynamic response generation and data injection.\n"
+          example: true
+      oneOf:
+      - title: BodyResponse
+        required:
+        - body
+        properties:
+          body:
+            type: string
+            description: 'The response body. Can include Handlebars templates if ''templated'' is true.
+
+              Use this to generate dynamic data like ''{{faker "person.firstName"}}''.
+
+              '
+            example: '{"status": "success", "user": "{{faker \"person.firstName\"}}"}'
+      - title: BlobPathResponse
+        required:
+        - blobPath
+        properties:
+          blobPath:
+            type: string
+            description: 'Reference to a file stored in Beeceptor''s storage.
+
+              Use the `POST /v2/endpoints/{endpoint}/blobs` API to upload files
+
+              and retrieve this path.
+
+              '
+            example: res-body-20260121042538-e53mertosm.json
+      required:
+      - type
+      - status
+      - headers
+    BodyParamCondition:
+      description: "Matches against parsed body parameters. This is applicable for JSON payloads, \nXML, or Form-Data where Beeceptor can extract named fields.\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - body_param
+            example: body_param
+          key:
+            type: string
+            description: The key or path to the field in the request body (e.g., 'user.id').
+            example: user.email
+          operator:
+            type: string
+            enum:
+            - equals
+            - not_equals
+            - contains
+            - not_contains
+            - is_null
+            - is_not_null
+            example: equals
+          value:
+            type: string
+            description: The value to compare against. Not required for 'is_null' or 'is_not_null'.
+            example: test@example.com
+        required:
+        - key
+        - operator
+        - value
+    WeightedResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A label for identifying this response in logs.
+          example: Success Response
+        weight:
+          type: number
+          description: Percentage probability (0-100). Total must sum to 100 per action.
+          example: 80
+        delay:
+          type: number
+          example: 0
+        status:
+          type: number
+          minimum: 100
+          maximum: 599
+          example: 200
+        headers:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: Content-Type
+              value:
+                type: string
+                example: application/json
+              templated:
+                type: boolean
+                example: false
+        body:
+          type: string
+          example: '{"status": "ok"}'
+        templated:
+          type: boolean
+          example: false
+      required:
+      - name
+      - weight
+      - status
+      - headers
+      - body
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

@@ -1,0 +1,685 @@
+openapi: 3.1.0
+info:
+  title: Beeceptor Endpoint Settings API
+  description: "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n"
+  version: 2.0.0
+  x-release-status: testing
+  x-internal: true
+servers:
+- url: https://api.beeceptor.com/api
+  description: Production API Server
+tags:
+- name: Endpoint Settings
+paths:
+  /v2/endpoints/{endpoint}/settings:
+    get:
+      summary: Get endpoint settings
+      description: Retrieve the current settings for the endpoint.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: Endpoint settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointSettings'
+              example:
+                security:
+                  enabled: true
+                  headerKey: some-key
+                  headerValue: some-value
+                cors:
+                  origins:
+                  - https://one.example.com
+                  - https://two.example.com
+                locale: en
+                rateLimit:
+                  enabled: true
+                  rate: 5
+                  period: Second
+                crud:
+                  autoDelete: true
+                customDomain:
+                  enabled: true
+                  domain: whitelabel.example.com
+                mtls:
+                  enabled: false
+                localTunnel: false
+                proxy:
+                  targetUrl: https://target.example.com
+                  ignoreSSLErrors: false
+                rules:
+                  enabled: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      summary: Update endpoint settings
+      description: Update specific settings for the endpoint.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndpointSettings'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointSettings'
+              example:
+                security:
+                  enabled: true
+                  headerKey: some-key
+                  headerValue: some-value
+                cors:
+                  origins:
+                  - https://one.example.com
+                  - https://two.example.com
+                locale: en
+                rateLimit:
+                  enabled: true
+                  rate: 5
+                  period: Second
+                crud:
+                  autoDelete: true
+                customDomain:
+                  enabled: true
+                  domain: whitelabel.example.com
+                mtls:
+                  enabled: false
+                localTunnel: false
+                proxy:
+                  targetUrl: https://target.example.com
+                  ignoreSSLErrors: false
+                rules:
+                  enabled: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v2/endpoints/{endpoint}/specs:
+    get:
+      summary: Get specification details
+      description: Returns the metadata and current configuration of the uploaded API specification (OAS, WSDL, gRPC, or GraphQL).
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - openapi
+                        - grpc
+                        - graphql
+                        - wsdl
+                      intelligenceMock:
+                        type: boolean
+              example:
+                data:
+                  type: openapi
+                  intelligenceMock: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Upload API specification (Async)
+      description: "Uploads an OpenAPI (YAML/JSON), WSDL, GraphQL, or Proto file to automate mock \nresponse generation. This is an asynchronous operation that returns a Job ID.\n"
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The specification file to upload (Max 2.5MB).
+                intelligenceMock:
+                  type: boolean
+                  description: Enable AI-driven mock response generation.
+      responses:
+        '202':
+          description: Upload accepted and processing initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              example:
+                jobId: job-9a7f3b2c1d
+                status: QUEUED
+                type: oas
+                message: Job queued for oas processing
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      summary: Delete API specification
+      description: "Removes the uploaded API specification and stops any automated mock \nbehaviors tied to it.\n"
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: Specification deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+              example:
+                data:
+                  deleted: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v2/endpoints/{endpoint}/jobs/{jobId}:
+    get:
+      summary: Get job status
+      description: Polls the status of an asynchronous background job using the Job ID returned during a specification upload.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: jobId
+        required: true
+        schema:
+          type: string
+        example: job-6a1ed3b07798
+      responses:
+        '200':
+          description: Job status retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              example:
+                jobId: job-6a1ed3b07798
+                status: COMPLETED
+                message: Job completed successfully
+                result:
+                  channelId: endpoint-name
+                  dashboardUrl: https://app.beeceptor.com/console/endpoint-name
+                completedAt: '2026-01-28T09:31:02.729Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v2/endpoints/{endpoint}/mtls/certificates:
+    get:
+      summary: Get all mTLS certificates
+      description: Lists all client certificates associated with this endpoint for Mutual TLS.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      responses:
+        '200':
+          description: A list of certificates.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Certificate'
+              example:
+                data:
+                - id: 6979d6d456c8ed5324860496
+                  name: cert-1
+                  cert: '-----BEGIN CERTIFICATE-----
+
+                    MIIEoDCCAogCAQ... (truncated)
+
+                    -----END CERTIFICATE-----
+
+                    '
+                  key: '-----BEGIN PRIVATE KEY-----
+
+                    MIIJQwIBAD... (truncated)
+
+                    -----END PRIVATE KEY-----
+
+                    '
+                  expiry: '2027-01-28T09:28:50.960Z'
+                  createdAt: '2026-01-28T09:28:52.938Z'
+                - id: 6979d6d856c8ed53248604a6
+                  name: cert-2
+                  cert: '-----BEGIN CERTIFICATE-----
+
+                    MIIEnjCCAoYCAQ... (truncated)
+
+                    -----END CERTIFICATE-----
+
+                    '
+                  key: '-----BEGIN PRIVATE KEY-----
+
+                    MIIJQgIBAD... (truncated)
+
+                    -----END PRIVATE KEY-----
+
+                    '
+                  expiry: '2027-01-28T09:28:55.827Z'
+                  createdAt: '2026-01-28T09:28:56.747Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Add mTLS certificate
+      description: Generates a new client certificate and private key for Mutual TLS authentication.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: A friendly name for the certificate.
+              required:
+              - name
+      responses:
+        '201':
+          description: Certificate added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+              example:
+                id: 6979d6d456c8ed5324860496
+                name: cert-1
+                cert: '-----BEGIN CERTIFICATE-----
+
+                  MIIEoDCCAogCAQ... (truncated)
+
+                  -----END CERTIFICATE-----
+
+                  '
+                key: '-----BEGIN PRIVATE KEY-----
+
+                  MIIJQwIBAD... (truncated)
+
+                  -----END PRIVATE KEY-----
+
+                  '
+                expiry: '2027-01-28T09:28:50.960Z'
+                createdAt: '2026-01-28T09:28:52.938Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v2/endpoints/{endpoint}/mtls/certificates/{certId}:
+    delete:
+      summary: Delete mTLS certificate
+      description: Remove a specific client certificate.
+      tags:
+      - Endpoint Settings
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/EndpointName'
+      - in: path
+        name: certId
+        required: true
+        schema:
+          type: string
+        example: 6979d6d456c8ed5324860496
+      responses:
+        '200':
+          description: Certificate deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  deleted:
+                    type: boolean
+                example:
+                  id: 6979d6d456c8ed5324860496
+                  deleted: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  responses:
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad Request - Payload validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    EndpointSettings:
+      type: object
+      description: Configuration settings for the mock endpoint, including security, CORS, and rate limits.
+      properties:
+        security:
+          type: object
+          description: "Secure your endpoint using mandatory header-based authentication. \nRequests missing the secret header will be rejected without affecting your quota.\n"
+          properties:
+            enabled:
+              type: boolean
+              example: false
+            headerKey:
+              type: string
+              description: The name of the header (e.g., 'Authorization' or 'x-api-key').
+              example: Authorization
+            headerValue:
+              type: string
+              description: The secret value required for access.
+              example: Bearer secret-token
+        cors:
+          type: object
+          description: Configure Cross-Origin Resource Sharing (CORS) whitelists.
+          properties:
+            origins:
+              type: array
+              items:
+                type: string
+                example: test.example.com
+        locale:
+          type: string
+          enum:
+          - en
+          - en_GB
+          - en_IN
+          - en_US
+          - fr
+          - id_ID
+          - ja
+          - pt_BR
+          - es
+          - es_MX
+          - zh_CN
+          description: The locale used by the template engine for generating random (faker) data.
+          example: en
+        rateLimit:
+          type: object
+          description: Restrict the volume of incoming traffic to prevent abuse or simulate throttling.
+          properties:
+            enabled:
+              type: boolean
+              example: true
+            rate:
+              type: integer
+              example: 10
+            period:
+              type: string
+              enum:
+              - Second
+              - Minute
+              - Hour
+              example: Second
+        crud:
+          type: object
+          description: Settings for stateful CRUD routes.
+          properties:
+            autoDelete:
+              type: boolean
+              description: "When enabled, Beeceptor automatically purges older records when the \nstorage limit is reached to accommodate new data.\n"
+              example: true
+        customDomain:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              example: false
+            domain:
+              type: string
+              example: api.example.com
+        mtls:
+          type: object
+          description: Mutual TLS settings for certificate-based client authentication.
+          properties:
+            enabled:
+              type: boolean
+              example: false
+        localTunnel:
+          type: boolean
+          description: 'If enabled, this endpoint routes all traffic to your localhost via the Beeceptor CLI.
+
+            Documentation: https://beeceptor.com/docs/local-tunneling-by-exposing-service-port/
+
+            '
+          example: false
+        proxy:
+          type: object
+          properties:
+            targetUrl:
+              type: string
+              description: Global destination for forwarding requests that don't match any rules.
+              example: https://echo.beeceptor.com
+            ignoreSSLErrors:
+              type: boolean
+              example: true
+        rules:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Master toggle for the mock rules engine.
+              example: true
+    Job:
+      type: object
+      description: Represents an asynchronous background task, such as processing a large API specification file.
+      properties:
+        jobId:
+          type: string
+          description: Unique identifier for tracking the job status.
+          example: job_9876543210
+        type:
+          type: string
+          enum:
+          - oas
+          - wsdl
+          - grpc
+          - graphql
+          description: The type of specification being processed.
+          example: oas
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - PROCESSING
+          - COMPLETED
+          - FAILED
+          description: Current lifecycle state of the job.
+          example: PROCESSING
+        message:
+          type: string
+          description: Detail or error message related to the job's progress.
+          example: Validating OpenAPI specification file.
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Progress completion percentage.
+          example: 45
+        currentStage:
+          type: string
+          description: The current processing stage (e.g., 'Validating', 'Mapping', 'Generating Rules').
+          example: Mapping
+        result:
+          type: object
+          description: The result data of the job, available upon completion.
+        completedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the job was completed.
+          example: '2026-01-28T10:00:00Z'
+        failedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the job failed.
+    Certificate:
+      type: object
+      description: Details of an mTLS client certificate managed within Beeceptor.
+      properties:
+        id:
+          type: string
+          description: internal certificate identifier.
+          example: cert_abc123
+        name:
+          type: string
+          description: User-defined label for the certificate.
+          example: My Client Cert
+        cert:
+          type: string
+          description: Public certificate in PEM format.
+          example: '-----BEGIN CERTIFICATE-----
+
+            MIIDDTCCAfWgAwIBAgIJAJ...
+
+            -----END CERTIFICATE-----'
+        key:
+          type: string
+          description: Private key in PEM format (Redacted in list views).
+          example: '-----BEGIN PRIVATE KEY-----
+
+            MIIEvgIBADANBgkqhkiG9w0B...
+
+            -----END PRIVATE KEY-----'
+        expiry:
+          type: string
+          format: date-time
+          description: Certificate expiration timestamp.
+          example: '2027-01-28T10:00:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-01-28T10:00:00Z'
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
