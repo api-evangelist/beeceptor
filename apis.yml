@@ -1,10 +1,23 @@
 aid: beeceptor
 name: Beeceptor
 url: https://raw.githubusercontent.com/api-evangelist/beeceptor/refs/heads/main/apis.yml
+accessModel:
+  pricing: free
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Free · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
 created: '2025-01-08'
 modified: '2026-05-04'
 type: Index
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/beeceptor.png
 access: 3rd-Party
 position: Consumer
 specificationVersion: '0.19'
@@ -28,7 +41,10 @@ apis:
   - Mock Servers
   - Testing
   humanURL: https://beeceptor.com/
-  description: Beeceptor's management API provides programmatic access to create and manage mock endpoints, rules, and traffic inspection on Scale and Enterprise plans. It enables teams to automate mock server provisioning, configure request matching rules, and integrate Beeceptor into CI/CD pipelines.
+  description: >-
+    Beeceptor's management API provides programmatic access to create and manage mock endpoints, rules,
+    and traffic inspection on Scale and Enterprise plans. It enables teams to automate mock server provisioning,
+    configure request matching rules, and integrate Beeceptor into CI/CD pipelines.
   properties:
   - type: Documentation
     url: https://beeceptor.com/docs/
@@ -38,6 +54,42 @@ apis:
     url: https://beeceptor.com/docs/
   - url: graphql/beeceptor-graphql.md
     type: GraphQL
+- aid: beeceptor:beeceptor-endpoint-settings-api
+  name: Beeceptor Endpoint Settings API
+  description: The Endpoint Settings API from Beeceptor — 5 operation(s) for endpoint settings.
+  humanURL: https://beeceptor.com/
+  tags:
+  - Endpoint Settings
+  properties:
+  - type: OpenAPI
+    url: openapi/beeceptor-endpoint-settings-api-openapi.yml
+- aid: beeceptor:beeceptor-mock-rules-api
+  name: Beeceptor Mock Rules API
+  description: The Mock Rules API from Beeceptor — 4 operation(s) for mock rules.
+  humanURL: https://beeceptor.com/
+  tags:
+  - Mock Rules
+  properties:
+  - type: OpenAPI
+    url: openapi/beeceptor-mock-rules-api-openapi.yml
+- aid: beeceptor:beeceptor-request-history-api
+  name: Beeceptor Request History API
+  description: The Request History API from Beeceptor — 3 operation(s) for request history.
+  humanURL: https://beeceptor.com/
+  tags:
+  - Request History
+  properties:
+  - type: OpenAPI
+    url: openapi/beeceptor-request-history-api-openapi.yml
+- aid: beeceptor:beeceptor-state-store-api
+  name: Beeceptor State Store API
+  description: The State Store API from Beeceptor — 2 operation(s) for state store.
+  humanURL: https://beeceptor.com/
+  tags:
+  - State Store
+  properties:
+  - type: OpenAPI
+    url: openapi/beeceptor-state-store-api-openapi.yml
 common:
 - type: AgenticAccess
   url: agentic-access/beeceptor-agentic-access.yml
