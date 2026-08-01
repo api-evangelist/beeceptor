@@ -1,0 +1,20 @@
+{
+  "provider": "beeceptor",
+  "sources": [
+    "beeceptor-endpoint-settings-api-openapi.yml",
+    "beeceptor-mock-rules-api-openapi.yml",
+    "beeceptor-request-history-api-openapi.yml",
+    "beeceptor-state-store-api-openapi.yml"
+  ],
+  "outputs": [
+    "beeceptor-endpoint-settings-api-openapi.yml",
+    "beeceptor-mock-rules-api-openapi.yml",
+    "beeceptor-request-history-api-openapi.yml",
+    "beeceptor-state-store-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
