@@ -1,0 +1,298 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Beeceptor Endpoint Settings Request History API",
+    "version": "2.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Request History",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get request history",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "method",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "path",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "behavior",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "ruleMatched",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "isMultipart",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "hasAttachments",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateFrom",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateTo",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateRange",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "requestBody",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "responseBody",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "mode",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves a paginated, searchable list of HTTP requests received by the mock server. Each request log contains metadata about the incoming request, the generated response, and how Beeceptor processed it.\n\n### Purpose\n\nThe Request History API enables:\n- Debugging API integrations by inspecting request/response payloads\n- Auditing API traffic patterns and usage\n- Verifying webhook deliveries and payload contents\n- Analyzing which mock rules matched incoming requests\n\n### How Request Logging Works\n"
+        },
+        {
+          "info": {
+            "name": "Delete request history",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "id",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "method",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "path",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "behavior",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "ruleMatched",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateFrom",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateTo",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "dateRange",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Deletes request history entries with optional filtering. Supports the same filtering parameters as GET, enabling selective bulk deletion of requests matching specific criteria.\n\n ### Purpose\n\n Use this endpoint to:\n - Bulk delete old or irrelevant request logs\n - Remove requests matching specific criteria (method, status, path, etc.)\n - Clean up test data after automated test runs\n\n ### How It Works\n\n 1. **Build Query**: Apply the same filters available in GET to target specific requests\n 2. **E"
+        },
+        {
+          "info": {
+            "name": "Get a single request",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request to retrieve."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves complete details for a specific request by its unique identifier. This endpoint always returns the verbose format with full request and response payloads.\n\n### Purpose\n\nUse this endpoint to:\n- Inspect the full details of a specific request\n- Debug why a particular request succeeded or failed\n- View the exact headers and body sent by the client\n- Examine the response that Beeceptor returned\n- Analyze proxy/callout details if the request was forwarded\n\n### Response Structure\n\nThe respons"
+        },
+        {
+          "info": {
+            "name": "Delete a single request",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request to delete."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Permanently deletes a specific request from the history by its unique identifier. This operation is irreversible.\n\n### Purpose\n\nUse this endpoint to:\n- Remove sensitive requests containing confidential data\n- Clean up test or debug requests\n\n### What Gets Deleted\n\n- The request log entry (metadata, headers, body)\n- Associated response data\n- Callout/proxy details (if applicable)\n- Multipart file metadata (actual files may be retained separately)\n\n### Limitations\n\n- Operation is irreversible; del"
+        },
+        {
+          "info": {
+            "name": "Download multipart file from request",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/requests/:requestId/multipart/download",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "requestId",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the request containing the file."
+              },
+              {
+                "name": "fieldName",
+                "value": "",
+                "type": "query",
+                "description": "The name of the form field containing the file."
+              },
+              {
+                "name": "component",
+                "value": "",
+                "type": "query",
+                "description": "The component where the file is located (Request or CalloutRequest)."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Downloads a file attachment from a multipart/form-data request. This endpoint retrieves the actual file content that was uploaded as part of a request.\n\n### Purpose\n\nUse this endpoint to:\n- Retrieve files uploaded via multipart requests\n- Download attachments for inspection or analysis\n- Export uploaded files for testing or compliance\n- Verify file contents match expected uploads\n\n### How It Works\n\nWhen a multipart/form-data request is received by Beeceptor:\n1. File metadata (field name, file na"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

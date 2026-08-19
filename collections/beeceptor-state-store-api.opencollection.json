@@ -1,0 +1,191 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Beeceptor Endpoint Settings State Store API",
+    "version": "2.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "State Store",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get all state variables",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "limit",
+                "value": "50",
+                "type": "query"
+              },
+              {
+                "name": "offset",
+                "value": "0",
+                "type": "query"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "query"
+              },
+              {
+                "name": "keyPrefix",
+                "value": "cart_",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieves a list of all persistent state variables (Counters, Lists, Data Store keys)\ndefined for this endpoint.\n"
+        },
+        {
+          "info": {
+            "name": "Upsert state variables",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Bulk updates or creates state variables."
+        },
+        {
+          "info": {
+            "name": "Delete state items",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Remove specified state variables by their keys."
+        },
+        {
+          "info": {
+            "name": "Get a single state item",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state/:type/:key",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "path"
+              },
+              {
+                "name": "key",
+                "value": "cart_items",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the value of a specific state item."
+        },
+        {
+          "info": {
+            "name": "Delete a single state item",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/state/:type/:key",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "type",
+                "value": "list",
+                "type": "path"
+              },
+              {
+                "name": "key",
+                "value": "cart_items",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a specific state item."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

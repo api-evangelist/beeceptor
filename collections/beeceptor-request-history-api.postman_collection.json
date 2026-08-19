@@ -1,0 +1,1859 @@
+{
+  "item": [
+    {
+      "id": "8f2f05cd-22c9-4398-ba01-5e463554d9de",
+      "name": "Request History",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "4440d0a6-ae0d-44d1-8723-1a40c703e873",
+          "name": "Get request history",
+          "request": {
+            "name": "Get request history",
+            "description": {
+              "content": "Retrieves a paginated, searchable list of HTTP requests received by the mock server. Each request log contains metadata about the incoming request, the generated response, and how Beeceptor processed it.\n\n### Purpose\n\nThe Request History API enables:\n- Debugging API integrations by inspecting request/response payloads\n- Auditing API traffic patterns and usage\n- Verifying webhook deliveries and payload contents\n- Analyzing which mock rules matched incoming requests\n\n### How Request Logging Works\n\nWhen a request arrives at a Beeceptor endpoint, the following information is captured:\n\n1. **Request Metadata**: HTTP method, path, timestamp, source IP\n2. **Request Details**: Headers, body content, HTTP version\n3. **Processing Information**: Which rule matched (if any), processing time, behavior type\n4. **Response Details**: Status code, headers, body content\n5. **Callout Information**: If the request was proxied, details of the upstream request/response\n\n### Behavior Types\n\nEach logged request includes a `behavior` field indicating how it was processed:\n\n| Behavior | Description |\n|----------|-------------|\n| `mock-rule` | Matched a user-defined mock rule |\n| `proxy` | Forwarded to upstream proxy target |\n| `callout` | Triggered an HTTP callout (sync or async) |\n| `grpc` | Processed as a gRPC request |\n| `wsdl` | Matched a SOAP/WSDL operation |\n| `graphql` | Processed as a GraphQL request |\n| `tunnel` | Forwarded to local machine via tunnel |\n| `oas` | Generated response from OpenAPI specification |\n\n### Response Modes\n\n**Compact Mode (Default)**\n\nReturns basic request information optimized for listing and overview:\n- `id`, `date`, `method`, `path`, `status`, `timeTaken`\n- `rule`: Whether a rule matched and which rule ID\n- `behavior`: How the request was processed\n\n**Verbose Mode (`mode=verbose`)**\n\nReturns complete request and response details for debugging:\n- All compact mode fields\n- `request`: Full request body, headers, HTTP version\n- `response`: Full response body, headers, HTTP version\n- `callout`: If proxied, includes target request/response details\n- `multipartData`: Metadata for file uploads (file content available via download endpoint)\n\n### Pagination\n\nUses cursor-based pagination for efficient traversal of large datasets:\n\n- Default page size: 20 requests\n- Maximum page size: 100 requests\n- Results are sorted by date descending (newest first)\n- Use the `cursor` from the response to fetch the next page\n- Continue until `pagination.hasMore` is `false`\n\n### Filtering Capabilities\n\nMultiple filters can be combined to narrow down results:\n\n**Time-Based Filters:**\n- `dateFrom` / `dateTo`: ISO 8601 timestamps for absolute date range\n- `dateRange`: Relative duration (e.g., '1h', '24h', '7d')\n\n**Request Filters:**\n- `method`: HTTP method (GET, POST, PUT, DELETE, PATCH)\n- `path`: Path substring or regex pattern\n- `status`: Response status code (200-599)\n- `requestBody`: Search within request body and multipart field names\n- `responseBody`: Search within response body\n\n**Processing Filters:**\n- `behavior`: How the request was handled\n- `ruleMatched`: Whether a mock rule matched (true/false)\n- `isMultipart`: Requests with file uploads\n\n### Multipart/Form-Data Handling\n\nFor requests containing file uploads:\n- File metadata (field name, file name, content type, size) is included in verbose mode\n- Actual file content is stored separately and available via the download endpoint\n- Search by field name or file name using the `requestBody` filter\n\n### Data Retention\n\n- Request history is retained for up to **10 days**\n- Older requests are automatically purged\n- Use the DELETE endpoint to manually clean up old requests\n\n### Sensitive Data Handling\n\nIf header masking is enabled in endpoint settings:\n- Sensitive headers (Authorization, API keys, etc.) are redacted\n- `redacted: true` flag indicates data was masked\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "requests"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "id",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "method",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "status",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "key": "path",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "behavior",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "ruleMatched",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "key": "isMultipart",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "key": "hasAttachments",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateFrom",
+                  "value": "<dateTime>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateTo",
+                  "value": "<dateTime>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateRange",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "requestBody",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "responseBody",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "mode",
+                  "value": "<string>"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "19878c55-f838-4879-b6fb-3769fe235595",
+              "name": "Request history retrieved successfully. \nResponse format:\n- Without `requestId` path parameter: Returns paginated array with cursor-based pagination\n- With `requestId` path parameter: Returns single RequestLog object directly\n",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "isMultipart",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "hasAttachments",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "requestBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "responseBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "mode",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"string\",\n      \"date\": \"2013-01-22T22:49:29.295Z\",\n      \"method\": \"string\",\n      \"path\": \"string\",\n      \"status\": 8419,\n      \"timeTaken\": 5504,\n      \"rule\": {\n        \"matched\": true,\n        \"ruleId\": \"string\"\n      },\n      \"behavior\": \"crud\"\n    },\n    {\n      \"id\": \"string\",\n      \"date\": \"1973-11-13T01:07:17.664Z\",\n      \"method\": \"string\",\n      \"path\": \"string\",\n      \"status\": 2928,\n      \"timeTaken\": 4850,\n      \"rule\": {\n        \"matched\": true,\n        \"ruleId\": \"string\"\n      },\n      \"behavior\": \"crud\"\n    }\n  ],\n  \"pagination\": {\n    \"cursor\": \"bmV4dF9jdXJzb3JfMTIz\",\n    \"hasMore\": true,\n    \"limit\": 50\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d2ed99b1-136b-4820-8638-5efdea002d7d",
+              "name": "Bad Request - Invalid query parameters or filter values",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "isMultipart",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "hasAttachments",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "requestBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "responseBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "mode",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b3292feb-322d-4109-b15b-414bf73c317b",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "isMultipart",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "hasAttachments",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "requestBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "responseBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "mode",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "af088e86-4f77-41bb-b3b8-65e90f4c74f3",
+              "name": "Not Found - Returned when fetching by requestId and request not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "isMultipart",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "hasAttachments",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "requestBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "responseBody",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "mode",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "823e2f22-ed28-4a25-b7d7-5c52243b1c54",
+          "name": "Delete request history",
+          "request": {
+            "name": "Delete request history",
+            "description": {
+              "content": "Deletes request history entries with optional filtering. Supports the same filtering parameters as GET, enabling selective bulk deletion of requests matching specific criteria.\n\n ### Purpose\n\n Use this endpoint to:\n - Bulk delete old or irrelevant request logs\n - Remove requests matching specific criteria (method, status, path, etc.)\n - Clean up test data after automated test runs\n\n ### How It Works\n\n 1. **Build Query**: Apply the same filters available in GET to target specific requests\n 2. **Execute Delete**: All matching requests are permanently deleted\n 3. **Return Count**: Response includes the number of deleted requests\n\n ### Filtering Options\n\n All GET filters are supported for selective deletion:\n\n **Time-Based:**\n - `dateFrom` / `dateTo`: Delete requests within a date range\n - `dateRange`: Delete requests from a relative time period\n\n **Request Attributes:**\n - `method`: Delete requests with specific HTTP method\n - `path`: Delete requests matching path pattern\n - `status`: Delete requests with specific status code\n - `behavior`: Delete requests handled by specific behavior type\n - `ruleMatched`: Delete requests that matched (or didn't match) rules\n\n **Content Search:**\n - `requestBody`: Delete requests containing specific text in body\n - `responseBody`: Delete requests with specific response content\n\n ### Delete All Requests\n\n To delete ALL requests for an endpoint, call this endpoint without any query parameters.\n\n **Warning**: This permanently removes all request history and cannot be undone.\n\n ### Common Deletion Patterns\n\n **Delete requests older than 7 days:**\n ```\n DELETE /requests?dateTo=2024-01-08T00:00:00Z\n ```\n\n **Delete all failed requests (5xx errors):**\n ```\n DELETE /requests?status=500\n ```\n\n **Delete requests from last hour:**\n ```\n DELETE /requests?dateRange=1h\n ```\n\n **Delete requests to a specific path:**\n ```\n DELETE /requests?path=/api/test\n ```\n\n ### Limitations\n\n - Operation is irreversible; deleted requests cannot be recovered\n - Associated multipart files are also deleted\n - Does not affect endpoint configuration, rules, or state\n\n ### Use Cases\n\n - **Post-Test Cleanup**: Remove all requests after a test run completes\n - **Retention Policy**: Automatically delete requests older than N days\n - **Privacy Compliance**: Remove requests containing specific patterns\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "requests"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "id",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "method",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "status",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "key": "path",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "behavior",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "key": "ruleMatched",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateFrom",
+                  "value": "<dateTime>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateTo",
+                  "value": "<dateTime>"
+                },
+                {
+                  "disabled": false,
+                  "key": "dateRange",
+                  "value": "<string>"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "372ff157-4149-48c1-b0b9-ee4b9fdc8825",
+              "name": "Requests deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"deleted\": true\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "01cfbd2c-e019-4472-b977-dd0d3eafccd6",
+              "name": "Bad Request - Invalid query parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6fa9cca3-8b98-4b0c-acf4-d868ef095941",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "method",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "path",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "behavior",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "ruleMatched",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "dateFrom",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateTo",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "dateRange",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "1c0860d1-f359-43d3-bc94-3983f3cb6e6e",
+          "name": "Get a single request",
+          "request": {
+            "name": "Get a single request",
+            "description": {
+              "content": "Retrieves complete details for a specific request by its unique identifier. This endpoint always returns the verbose format with full request and response payloads.\n\n### Purpose\n\nUse this endpoint to:\n- Inspect the full details of a specific request\n- Debug why a particular request succeeded or failed\n- View the exact headers and body sent by the client\n- Examine the response that Beeceptor returned\n- Analyze proxy/callout details if the request was forwarded\n\n### Response Structure\n\nThe response includes all available information about the request:\n\n**Core Fields:**\n- `id`: Unique request identifier\n- `date`: ISO 8601 timestamp when request was received\n- `method`: HTTP method (GET, POST, PUT, DELETE, etc.)\n- `path`: Full request path including query parameters\n- `status`: HTTP response status code returned\n- `timeTaken`: Processing time in milliseconds\n\n**Rule Matching:**\n- `rule.matched`: Boolean indicating if a mock rule matched\n- `rule.ruleId`: ID of the matched rule (if any)\n- `rule.weightedResponse`: Name of selected response (for weighted rules)\n\n**Request Details:**\n- `request.body`: Raw request body content\n- `request.headers`: Object containing all request headers\n- `request.httpVersion`: HTTP version used (e.g., \"HTTP/1.1\", \"HTTP/2\")\n- `request.isMultipart`: Boolean for multipart/form-data requests\n- `request.multipartData`: Array of file/field metadata (for multipart requests)\n- `request.redacted`: Boolean indicating if sensitive data was masked\n\n**Response Details:**\n- `response.body`: Raw response body content\n- `response.headers`: Object containing all response headers\n- `response.httpVersion`: HTTP version used\n- `response.blob`: Boolean if response was served from blob storage\n- `response.blobPath`: Path to blob file (if blob response)\n- `response.redacted`: Boolean indicating if sensitive data was masked\n\n**Callout Details (if request was proxied):**\n- `callout.url`: Target URL for the callout\n- `callout.method`: HTTP method used for callout\n- `callout.behavior`: Sync or async callout\n- `callout.delay`: Artificial delay applied (if any)\n- `callout.targetRequest`: Headers and body sent to upstream\n- `callout.targetResponse`: Headers and body received from upstream\n\n**gRPC Requests:**\nFor gRPC requests, the structure differs slightly:\n- `request.messages`: Array of gRPC request messages with body, headers, timestamp\n- `response.messages`: Array of gRPC response messages with body, timestamp\n\n### Use Cases\n\n- **Debugging Integration Issues**: Examine exact payloads when API calls fail\n- **Webhook Verification**: Confirm webhook payloads match expectations\n- **Rule Testing**: Verify that the correct rule matched a request\n- **Proxy Analysis**: Inspect both client and upstream communications\n- **Support Requests**: Share specific request details when reporting issues\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "requests",
+                ":requestId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "requestId",
+                  "description": "(Required) The unique identifier of the request to retrieve."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "7ffc5b1b-86f8-4584-8a58-6e5336eb6915",
+              "name": "Request details (verbose format with full details)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"behavior\": \"mock-rule\",\n  \"date\": \"1978-02-19T22:37:04.491Z\",\n  \"id\": \"string\",\n  \"method\": \"string\",\n  \"path\": \"string\",\n  \"request\": {\n    \"body\": \"string\",\n    \"headers\": {\n      \"key_0\": \"string\",\n      \"key_1\": \"string\"\n    },\n    \"httpVersion\": \"string\",\n    \"redacted\": false\n  },\n  \"response\": {\n    \"body\": \"string\",\n    \"headers\": {\n      \"key_0\": \"string\"\n    },\n    \"httpVersion\": \"string\",\n    \"redacted\": true\n  },\n  \"rule\": {\n    \"matched\": true,\n    \"ruleId\": \"string\"\n  },\n  \"status\": 7967,\n  \"timeTaken\": 133\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8e96a8ed-e75d-4109-9a93-0313e83a5b5c",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8e951e36-f495-4bf7-88b2-998dafba2c5c",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request to retrieve."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ceae6f73-7d5c-421f-aad2-1cc5b6edddda",
+          "name": "Delete a single request",
+          "request": {
+            "name": "Delete a single request",
+            "description": {
+              "content": "Permanently deletes a specific request from the history by its unique identifier. This operation is irreversible.\n\n### Purpose\n\nUse this endpoint to:\n- Remove sensitive requests containing confidential data\n- Clean up test or debug requests\n\n### What Gets Deleted\n\n- The request log entry (metadata, headers, body)\n- Associated response data\n- Callout/proxy details (if applicable)\n- Multipart file metadata (actual files may be retained separately)\n\n### Limitations\n\n- Operation is irreversible; deleted requests cannot be recovered\n- Does not affect endpoint configuration, rules, or state\n- Multipart file content may be retained temporarily for other requests\n\n### Use Cases\n\n- **Test Cleanup**: Delete test requests that clutter the history\n- **Security**: Remove requests with accidentally exposed credentials\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "requests",
+                ":requestId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "requestId",
+                  "description": "(Required) The unique identifier of the request to delete."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "502b24dd-c2b0-4680-ad9d-38277825b6c1",
+              "name": "Request deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request to delete."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"deleted\": true\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3941bffd-1713-49fc-94d0-c7d2b4081b4a",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request to delete."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5cc2c024-f31f-463c-91a0-66c29372379b",
+          "name": "Download multipart file from request",
+          "request": {
+            "name": "Download multipart file from request",
+            "description": {
+              "content": "Downloads a file attachment from a multipart/form-data request. This endpoint retrieves the actual file content that was uploaded as part of a request.\n\n### Purpose\n\nUse this endpoint to:\n- Retrieve files uploaded via multipart requests\n- Download attachments for inspection or analysis\n- Export uploaded files for testing or compliance\n- Verify file contents match expected uploads\n\n### How It Works\n\nWhen a multipart/form-data request is received by Beeceptor:\n1. File metadata (field name, file name, content type, size) is stored with the request log\n2. File content is stored separately in binary format\n3. The request history shows file metadata but not content (to keep responses manageable)\n4. This endpoint retrieves the actual file content\n\n### Required Parameters\n\nBoth query parameters are required to identify the specific file:\n\n**fieldName**: The name of the form field containing the file\n- Must match the `name` attribute in the multipart form\n- Example: For `<input type=\"file\" name=\"document\">`, use `fieldName=document`\n\n**component**: Where the file was captured\n- `Request`: File from the incoming client request\n- `CalloutRequest`: File forwarded to an upstream proxy target\n\n### Response\n\nReturns the raw file content with appropriate headers:\n- `Content-Type`: Original MIME type of the uploaded file\n- `Content-Disposition`: Attachment with original filename\n- `Content-Length`: File size in bytes\n\n### Finding File Information\n\nTo identify which files are available for a request:\n1. Call GET `/requests/{requestId}` (returns verbose format)\n2. Check `request.multipartData` array for file metadata\n3. Use `fieldName` and `fileName` from the metadata\n\n### Limitations\n\n- Only files (not text fields) can be downloaded\n- File must exist in the request's multipart data\n- Files are retained for the same duration as request history (up to 10 days)\n- Maximum file size depends on subscription plan\n\n### Use Cases\n\n- **Debugging File Uploads**: Verify uploaded files match expectations\n- **Compliance Auditing**: Review files submitted through your API\n- **Test Verification**: Confirm test files were received correctly\n- **Data Export**: Extract files for external analysis      tags: [Request History]\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "requests",
+                ":requestId",
+                "multipart",
+                "download"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "fieldName",
+                  "value": "<string>",
+                  "description": "(Required) The name of the form field containing the file."
+                },
+                {
+                  "disabled": false,
+                  "key": "component",
+                  "value": "<string>",
+                  "description": "(Required) The component where the file is located (Request or CalloutRequest)."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "requestId",
+                  "description": "(Required) The unique identifier of the request containing the file."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/octet-stream"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "329b27a0-fa33-4c1d-ad9b-8fed1b82676f",
+              "name": "File downloaded successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId",
+                    "multipart",
+                    "download"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldName",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "component",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request containing the file."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/octet-stream"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/octet-stream"
+                }
+              ],
+              "body": "string",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1973faa7-b7e0-4199-a31d-2a11b7377b7f",
+              "name": "Bad Request - Missing required query parameters (fieldName or component)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId",
+                    "multipart",
+                    "download"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldName",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "component",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request containing the file."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0ebde277-04bb-472f-9d6b-fbc909b7c886",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId",
+                    "multipart",
+                    "download"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldName",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "component",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request containing the file."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "374a4c9f-bede-491d-b059-111d6003e9bd",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "requests",
+                    ":requestId",
+                    "multipart",
+                    "download"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldName",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "component",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "requestId",
+                      "description": "(Required) The unique identifier of the request containing the file."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.beeceptor.com/api",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "c10683a8-af32-436c-883d-6992fc590644",
+    "name": "Beeceptor Endpoint Settings Request History API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n",
+      "type": "text/plain"
+    }
+  }
+}

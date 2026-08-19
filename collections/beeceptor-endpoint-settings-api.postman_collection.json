@@ -1,0 +1,2310 @@
+{
+  "item": [
+    {
+      "id": "fbb2d0cf-c14f-41b3-afaa-33c7dc94d6fb",
+      "name": "Endpoint Settings",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "0d1e8498-780f-405e-a562-c21e3a60d58a",
+          "name": "Get endpoint settings",
+          "request": {
+            "name": "Get endpoint settings",
+            "description": {
+              "content": "Retrieve the current settings for the endpoint.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "settings"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "e7da7b27-0b5e-4a0d-b26c-e99f8617a088",
+              "name": "Endpoint settings",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "settings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"security\": {\n    \"enabled\": true,\n    \"headerKey\": \"some-key\",\n    \"headerValue\": \"some-value\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"https://one.example.com\",\n      \"https://two.example.com\"\n    ]\n  },\n  \"locale\": \"en\",\n  \"rateLimit\": {\n    \"enabled\": true,\n    \"rate\": 5,\n    \"period\": \"Second\"\n  },\n  \"crud\": {\n    \"autoDelete\": true\n  },\n  \"customDomain\": {\n    \"enabled\": true,\n    \"domain\": \"whitelabel.example.com\"\n  },\n  \"mtls\": {\n    \"enabled\": false\n  },\n  \"localTunnel\": false,\n  \"proxy\": {\n    \"targetUrl\": \"https://target.example.com\",\n    \"ignoreSSLErrors\": false\n  },\n  \"rules\": {\n    \"enabled\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "55dae8a0-5de9-473b-b9e4-6e009f1c2a38",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "settings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "de5ecb20-3955-49ad-8601-9c2b9b7d13ea",
+          "name": "Update endpoint settings",
+          "request": {
+            "name": "Update endpoint settings",
+            "description": {
+              "content": "Update specific settings for the endpoint.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "settings"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"security\": {\n    \"enabled\": \"<boolean>\",\n    \"headerKey\": \"<string>\",\n    \"headerValue\": \"<string>\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"<string>\",\n      \"<string>\"\n    ]\n  },\n  \"locale\": \"<string>\",\n  \"rateLimit\": {\n    \"enabled\": \"<boolean>\",\n    \"rate\": \"<integer>\",\n    \"period\": \"<string>\"\n  },\n  \"crud\": {\n    \"autoDelete\": \"<boolean>\"\n  },\n  \"customDomain\": {\n    \"enabled\": \"<boolean>\",\n    \"domain\": \"<string>\"\n  },\n  \"mtls\": {\n    \"enabled\": \"<boolean>\"\n  },\n  \"localTunnel\": \"<boolean>\",\n  \"proxy\": {\n    \"targetUrl\": \"<string>\",\n    \"ignoreSSLErrors\": \"<boolean>\"\n  },\n  \"rules\": {\n    \"enabled\": \"<boolean>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c92c21e3-af15-4789-8d19-4bc73ad6829f",
+              "name": "Settings updated",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "settings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"security\": {\n    \"enabled\": false,\n    \"headerKey\": \"Authorization\",\n    \"headerValue\": \"Bearer secret-token\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"test.example.com\",\n      \"test.example.com\"\n    ]\n  },\n  \"locale\": \"en\",\n  \"rateLimit\": {\n    \"enabled\": true,\n    \"rate\": 10,\n    \"period\": \"Second\"\n  },\n  \"crud\": {\n    \"autoDelete\": true\n  },\n  \"customDomain\": {\n    \"enabled\": false,\n    \"domain\": \"api.example.com\"\n  },\n  \"mtls\": {\n    \"enabled\": false\n  },\n  \"localTunnel\": false,\n  \"proxy\": {\n    \"targetUrl\": \"https://echo.beeceptor.com\",\n    \"ignoreSSLErrors\": true\n  },\n  \"rules\": {\n    \"enabled\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"security\": {\n    \"enabled\": true,\n    \"headerKey\": \"some-key\",\n    \"headerValue\": \"some-value\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"https://one.example.com\",\n      \"https://two.example.com\"\n    ]\n  },\n  \"locale\": \"en\",\n  \"rateLimit\": {\n    \"enabled\": true,\n    \"rate\": 5,\n    \"period\": \"Second\"\n  },\n  \"crud\": {\n    \"autoDelete\": true\n  },\n  \"customDomain\": {\n    \"enabled\": true,\n    \"domain\": \"whitelabel.example.com\"\n  },\n  \"mtls\": {\n    \"enabled\": false\n  },\n  \"localTunnel\": false,\n  \"proxy\": {\n    \"targetUrl\": \"https://target.example.com\",\n    \"ignoreSSLErrors\": false\n  },\n  \"rules\": {\n    \"enabled\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f6ca7ab9-4844-46ad-927c-7fb4701e8e51",
+              "name": "Bad Request - Payload validation failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "settings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"security\": {\n    \"enabled\": false,\n    \"headerKey\": \"Authorization\",\n    \"headerValue\": \"Bearer secret-token\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"test.example.com\",\n      \"test.example.com\"\n    ]\n  },\n  \"locale\": \"en\",\n  \"rateLimit\": {\n    \"enabled\": true,\n    \"rate\": 10,\n    \"period\": \"Second\"\n  },\n  \"crud\": {\n    \"autoDelete\": true\n  },\n  \"customDomain\": {\n    \"enabled\": false,\n    \"domain\": \"api.example.com\"\n  },\n  \"mtls\": {\n    \"enabled\": false\n  },\n  \"localTunnel\": false,\n  \"proxy\": {\n    \"targetUrl\": \"https://echo.beeceptor.com\",\n    \"ignoreSSLErrors\": true\n  },\n  \"rules\": {\n    \"enabled\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a1e3f73c-3815-4017-942e-b6838190347a",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "settings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"security\": {\n    \"enabled\": false,\n    \"headerKey\": \"Authorization\",\n    \"headerValue\": \"Bearer secret-token\"\n  },\n  \"cors\": {\n    \"origins\": [\n      \"test.example.com\",\n      \"test.example.com\"\n    ]\n  },\n  \"locale\": \"en\",\n  \"rateLimit\": {\n    \"enabled\": true,\n    \"rate\": 10,\n    \"period\": \"Second\"\n  },\n  \"crud\": {\n    \"autoDelete\": true\n  },\n  \"customDomain\": {\n    \"enabled\": false,\n    \"domain\": \"api.example.com\"\n  },\n  \"mtls\": {\n    \"enabled\": false\n  },\n  \"localTunnel\": false,\n  \"proxy\": {\n    \"targetUrl\": \"https://echo.beeceptor.com\",\n    \"ignoreSSLErrors\": true\n  },\n  \"rules\": {\n    \"enabled\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "693fa7b6-9eb5-46f7-a1a1-feb9a79caa6e",
+          "name": "Get specification details",
+          "request": {
+            "name": "Get specification details",
+            "description": {
+              "content": "Returns the metadata and current configuration of the uploaded API specification (OAS, WSDL, gRPC, or GraphQL).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "specs"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "aeb4bc5c-71b6-4e87-a205-e8b371ea6042",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"type\": \"openapi\",\n    \"intelligenceMock\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fbc6c86b-2513-4334-b869-8569ff2ebbf6",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f546f667-56e3-417b-b344-bd90fe31afb1",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "239b1665-5469-421e-b060-93282c1276ab",
+          "name": "Upload API specification (Async)",
+          "request": {
+            "name": "Upload API specification (Async)",
+            "description": {
+              "content": "Uploads an OpenAPI (YAML/JSON), WSDL, GraphQL, or Proto file to automate mock \nresponse generation. This is an asynchronous operation that returns a Job ID.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "specs"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "The specification file to upload (Max 2.5MB)."
+                },
+                {
+                  "key": "intelligenceMock",
+                  "value": "<boolean>",
+                  "type": "text",
+                  "description": "Enable AI-driven mock response generation."
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "aa1c1d32-1814-415f-8be0-bd68a3aec848",
+              "name": "Upload accepted and processing initiated.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "The specification file to upload (Max 2.5MB).",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "Enable AI-driven mock response generation.",
+                        "type": "text/plain"
+                      },
+                      "key": "intelligenceMock",
+                      "value": "<boolean>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jobId\": \"job-9a7f3b2c1d\",\n  \"status\": \"QUEUED\",\n  \"type\": \"oas\",\n  \"message\": \"Job queued for oas processing\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9b85a8ac-a85e-4868-a239-f7d4bba9911b",
+              "name": "Bad Request - Payload validation failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "The specification file to upload (Max 2.5MB).",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "Enable AI-driven mock response generation.",
+                        "type": "text/plain"
+                      },
+                      "key": "intelligenceMock",
+                      "value": "<boolean>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7a2c7d61-4435-43cb-8a17-f07b545d1546",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "description": {
+                        "content": "The specification file to upload (Max 2.5MB).",
+                        "type": "text/plain"
+                      },
+                      "key": "file",
+                      "value": "<binary>",
+                      "type": "text"
+                    },
+                    {
+                      "description": {
+                        "content": "Enable AI-driven mock response generation.",
+                        "type": "text/plain"
+                      },
+                      "key": "intelligenceMock",
+                      "value": "<boolean>",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a7c597c1-a1ec-49de-bf82-1110265f29bb",
+          "name": "Delete API specification",
+          "request": {
+            "name": "Delete API specification",
+            "description": {
+              "content": "Removes the uploaded API specification and stops any automated mock \nbehaviors tied to it.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "specs"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "81c09e34-ae00-4815-9833-575e24e0d00b",
+              "name": "Specification deleted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"deleted\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e493764e-53be-4529-807b-721572bb2028",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "specs"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "398111ae-4af3-4afb-a700-6991df5986b9",
+          "name": "Get job status",
+          "request": {
+            "name": "Get job status",
+            "description": {
+              "content": "Polls the status of an asynchronous background job using the Job ID returned during a specification upload.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "jobs",
+                ":jobId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "jobId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "69a73456-bd82-4fb5-a54a-2914094bb411",
+              "name": "Job status retrieved successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "jobId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jobId\": \"job-6a1ed3b07798\",\n  \"status\": \"COMPLETED\",\n  \"message\": \"Job completed successfully\",\n  \"result\": {\n    \"channelId\": \"endpoint-name\",\n    \"dashboardUrl\": \"https://app.beeceptor.com/console/endpoint-name\"\n  },\n  \"completedAt\": \"2026-01-28T09:31:02.729Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0a071c9d-64b2-43ab-80f5-28e0b8a2fb51",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "jobId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a110fa54-b3de-421b-be43-25572d45771c",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "jobs",
+                    ":jobId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "jobId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "daed8203-7445-4a2b-a20d-558af027b12a",
+          "name": "Get all mTLS certificates",
+          "request": {
+            "name": "Get all mTLS certificates",
+            "description": {
+              "content": "Lists all client certificates associated with this endpoint for Mutual TLS.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "mtls",
+                "certificates"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "fb5b6957-8a5e-478b-8efe-0c1ca6700bc3",
+              "name": "A list of certificates.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"6979d6d456c8ed5324860496\",\n      \"name\": \"cert-1\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQwIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n      \"expiry\": \"2027-01-28T09:28:50.960Z\",\n      \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n    },\n    {\n      \"id\": \"6979d6d856c8ed53248604a6\",\n      \"name\": \"cert-2\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEnjCCAoYCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQgIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n      \"expiry\": \"2027-01-28T09:28:55.827Z\",\n      \"createdAt\": \"2026-01-28T09:28:56.747Z\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "400d8e63-441a-42d7-a956-fdf4b9c477f7",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0236e25d-c907-4deb-b5ba-45bd5ab6783e",
+          "name": "Add mTLS certificate",
+          "request": {
+            "name": "Add mTLS certificate",
+            "description": {
+              "content": "Generates a new client certificate and private key for Mutual TLS authentication.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "mtls",
+                "certificates"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "b5769866-e1b5-4598-9a38-1284d223c1f2",
+              "name": "Certificate added.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"6979d6d456c8ed5324860496\",\n  \"name\": \"cert-1\",\n  \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n  \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQwIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n  \"expiry\": \"2027-01-28T09:28:50.960Z\",\n  \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a05494e4-1bfa-43cf-b4af-7de85f6d6001",
+              "name": "Bad Request - Payload validation failed.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1a7c90a0-18ad-4299-a792-3d7402941544",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c708cbd4-4bcf-41a5-8b7f-64f09d1fad9c",
+              "name": "Unauthorized - You don't have access to this endpoint.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f6072cb8-8ae1-4142-9bfc-067c4d82b635",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a981b76d-8d7c-450d-b247-92220cd1618f",
+              "name": "Internal Server Error - An unexpected error occurred.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3904dc0f-6088-48d6-a605-0c3c5c4418b3",
+          "name": "Delete mTLS certificate",
+          "request": {
+            "name": "Delete mTLS certificate",
+            "description": {
+              "content": "Remove a specific client certificate.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "endpoints",
+                ":endpoint",
+                "mtls",
+                "certificates",
+                ":certId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "{{endpoint}}",
+                  "key": "endpoint",
+                  "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "certId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "Authorization"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "f866b7b6-7867-4236-bf3b-f64c76b8edca",
+              "name": "Certificate deleted.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates",
+                    ":certId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "certId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"deleted\": true\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "80ec97aa-92d0-4670-a587-4c50a4e1391e",
+              "name": "Unauthenticated - API key is missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates",
+                    ":certId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "certId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b4152046-5bbe-4da3-8723-e03086d2f817",
+              "name": "Not Found - The requested resource does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "endpoints",
+                    ":endpoint",
+                    "mtls",
+                    "certificates",
+                    ":certId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "{{endpoint}}",
+                      "key": "endpoint",
+                      "description": "(Required) The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "certId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"validation_error\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      },\n      {\n        \"path\": \"/rules[0]/action/status\",\n        \"message\": \"must be greater than or equal to 100\",\n        \"received\": \"50\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.beeceptor.com/api",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "3cb69a75-4188-496c-a870-defebe61c431",
+    "name": "Beeceptor Endpoint Settings API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n",
+      "type": "text/plain"
+    }
+  }
+}

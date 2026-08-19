@@ -1,0 +1,276 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Beeceptor Endpoint Settings API",
+    "version": "2.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Endpoint Settings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get endpoint settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/settings",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the current settings for the endpoint."
+        },
+        {
+          "info": {
+            "name": "Update endpoint settings",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/settings",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update specific settings for the endpoint."
+        },
+        {
+          "info": {
+            "name": "Get specification details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns the metadata and current configuration of the uploaded API specification (OAS, WSDL, gRPC, or GraphQL)."
+        },
+        {
+          "info": {
+            "name": "Upload API specification (Async)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "multipart-form",
+              "data": [
+                {
+                  "name": "file",
+                  "type": "text",
+                  "value": ""
+                },
+                {
+                  "name": "intelligenceMock",
+                  "type": "text",
+                  "value": ""
+                }
+              ]
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Uploads an OpenAPI (YAML/JSON), WSDL, GraphQL, or Proto file to automate mock \nresponse generation. This is an asynchronous operation that returns a Job ID.\n"
+        },
+        {
+          "info": {
+            "name": "Delete API specification",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/specs",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Removes the uploaded API specification and stops any automated mock \nbehaviors tied to it.\n"
+        },
+        {
+          "info": {
+            "name": "Get job status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/jobs/:jobId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "jobId",
+                "value": "job-6a1ed3b07798",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Polls the status of an asynchronous background job using the Job ID returned during a specification upload."
+        },
+        {
+          "info": {
+            "name": "Get all mTLS certificates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Lists all client certificates associated with this endpoint for Mutual TLS."
+        },
+        {
+          "info": {
+            "name": "Add mTLS certificate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Generates a new client certificate and private key for Mutual TLS authentication."
+        },
+        {
+          "info": {
+            "name": "Delete mTLS certificate",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.beeceptor.com/api/v2/endpoints/:endpoint/mtls/certificates/:certId",
+            "params": [
+              {
+                "name": "endpoint",
+                "value": "order-service",
+                "type": "path",
+                "description": "The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)"
+              },
+              {
+                "name": "certId",
+                "value": "6979d6d456c8ed5324860496",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "Authorization",
+              "value": "{{Authorization}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Remove a specific client certificate."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
