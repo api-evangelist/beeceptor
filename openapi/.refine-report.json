@@ -1,10 +1,7 @@
 {
   "provider": "beeceptor",
   "sources": [
-    "beeceptor-endpoint-settings-api-openapi.yml",
-    "beeceptor-mock-rules-api-openapi.yml",
-    "beeceptor-request-history-api-openapi.yml",
-    "beeceptor-state-store-api-openapi.yml"
+    "_original/beeceptor-openapi.yml"
   ],
   "outputs": [
     "beeceptor-endpoint-settings-api-openapi.yml",
@@ -15,6 +12,19 @@
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "beeceptor-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "beeceptor-openapi.yml: declared missing tag: Endpoint Settings",
+    "beeceptor-openapi.yml: declared missing tag: Mock Rules",
+    "beeceptor-openapi.yml: declared missing tag: Request History",
+    "beeceptor-openapi.yml: declared missing tag: State Store",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "beeceptor-endpoint-settings-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "beeceptor-mock-rules-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "beeceptor-request-history-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "beeceptor-state-store-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

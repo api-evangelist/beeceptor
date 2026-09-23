@@ -1,7 +1,7 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Beeceptor Endpoint Settings State Store API
-  description: "\nThis documentation describes the **Beeceptor Mock Server Management APIs**. It is used to programmatically configure, inspect, and operate Beeceptor mock servers.\n\n**You can find the OpenAPI specification here:** [Beeceptor Management APIs (OpenAPI Spec)](https://beeceptor.com/docs/openapi/beeceptor-openapi-v2.yaml) \n\n## What is Beeceptor?\n\nBeeceptor is a developer-focused API simulation platform. It is a **behavioral API simulator** designed for mocking, service virtualization, contract testing, and controlled failure simulation.\n\nBeeceptor provides:\n\n- HTTP, Rest, SOAP, gRPC and GraphQL API mocking\n- Stateful API prototyping (CRUD, counters, lists)\n- Failure, latency, and chaos testing\n- Proxying and controlled callouts to real upstream services\n\nBeeceptor operates by **matching incoming requests against declarative rules**\nand **emitting predefined or dynamically generated responses**. It guarantees:\n- Deterministic rule evaluation order\n- Isolation between endpoints\n- Explicit behavior only, no hidden defaults\n\nBeeceptor is not an API gateway, backend framework, or production runtime. It does not attempt to infer business rules or validate domain correctness unless explicitly configured.\n\n## Entities\n\n### Endpoint\n\nAn **Endpoint** is an isolated mock server identified by a unique subdomain.\n\n- Owns its own configuration, rules, and state\n- Receives all incoming HTTP or traffic for that subdomain\n- Acts as the root execution boundary\n\nAll requests are evaluated strictly within the context of the endpoint they arrive on.\n\n### Mock Rule\n\nA **Mock Rule** is an ordered, declarative instruction that defines:\n\n- How to match an incoming request\n- What response to emit when matched\n- Optional delays, randomness, or state conditions\n\nThese rules are evaluated top-to-bottom. The first matching rule is selected and executed. Once matched, no further rules are evaluated after a match. A rule has one or more conditions under which a rule applies This matching can evalute:\n- HTTP method\n- URL path or regex\n- Headers\n- Request body content\n- Stateful conditions (counters, lists, datastore values)\n\nAll the conditions must evaluate to true for a rule to match or win for the response generation.\n\n## Response Generation\n\nA response definition specifies what Beeceptor returns when a rule is matched.\n\nA response may include:\n- HTTP status code\n- Headers\n- Static payloads\n- Templated payloads\n- Weighted random responses\n\nThe responses are emitted exactly as defined in the mock rule. Beeceptor does not modify payloads beyond explicit templating instructions.\n\n### Template Engine\n\nThe template engine serves as an optional response processor, enabling the creation of dynamic and context-aware payloads.\n\nWhen this feature is enabled, responses can:\n- Reference data from the incoming request, such as headers, query parameters, and the body.\n- Generate synthetic or randomized values using built-in functions.\n- Apply conditional logic and iterative loops for complex response structures.\n- Integrate with stateful storage to maintain persistence across calls.\n\nThese templates are evaluated dynamically at the time of the request, following the identification of a matching rule.\n\n## Stateful Storage\n\nBeeceptor provides a suite of lightweight, endpoint-scoped state primitives designed to facilitate dynamic response behavior and simulate stateful API interactions.\n\nThe following storage types are supported:\n- CRUD Datastore: A flexible storage mechanism for JSON objects, supporting standard create, read, update, and delete operations.\n- Counters: Numeric primitives suitable for maintaining sequence-based or incremental state.\n- Lists: Ordered collections that allow for both append operations and structured querying.\n- Key-Value Store: A fundamental storage type for persisting simple data pairs.\n\nAll state is strictly isolated to its respective endpoint context. The data is managed as transient simulation state and is not intended for high-durability or long-term storage.\n\n## HTTP Callout\n\nBeeceptor can be configured as a programmable intermediary to forward incoming traffic to specified upstream services.\n\nThese rules support several advanced integration patterns:\n- Synchronous Forwarding: Inbound requests are transmitted to the target service, and the resulting response is relayed back to the client.\n- Payload Transformation: The system can dynamically modify both request and response data while in transit.\n- Latency Simulation: Artificial delays can be introduced to model various network conditions or service dependencies.\n- Asynchronous Callouts: Operations can be executed in a fire-and-forget mode, which is ideal for triggering background webhooks without delaying the client response.\n\n## Primary Use Cases\n\n**Automated Testing and CI/CD Integration**\n- Configure and update mock behaviors dynamically through the Beeceptor Management API.\n- Substitute external dependencies with consistent mock endpoints during automated test suites.\n- Enable deterministic environment setup and teardown for reliable continuous integration.\n\n**Accelerating Frontend Development**\n- Implement mock rules to simulate specific edge cases and error scenarios.\n- Proceed with user interface development independently of backend progress.\n- Utilize OpenAPI, GraphQL, gRPC, WSDL specifications and predefined examples to generate functional response payloads.\n\n**Performance and Resilience Evaluation**\n- Introduce artificial network latency and weighted response distribution to test system limits.\n- Reproduce timeouts, server-side errors, and intermittent service unavailability.\n- Validate application stability and retry logic without impacting live infrastructure.\n\n**Rapid Stateful Prototyping**\n- Design complex, state-dependent API workflows using built-in CRUD and storage primitives.\n- Iterate on application logic and data flows without the overhead of database management.\n- Programmatically manage and reset simulation state to maintain test consistency.\n"
+  title: Beeceptor State Store API
+  description: This documentation describes the **Beeceptor Mock Server Management APIs**.
   version: 2.0.0
   x-release-status: testing
   x-internal: true
@@ -16,9 +16,7 @@ paths:
       summary: Get all state variables
       description: 'Retrieves a list of all persistent state variables (Counters, Lists, Data Store keys)
 
-        defined for this endpoint.
-
-        '
+        defined for this endpoint.'
       tags:
       - State Store
       security:
@@ -87,6 +85,8 @@ paths:
                   hasMore: false
         '401':
           $ref: '#/components/responses/Unauthorized'
+      operationId: getV2EndpointsByEndpointState
+      x-operation-id-source: derived
     put:
       summary: Upsert state variables
       description: Bulk updates or creates state variables.
@@ -132,6 +132,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
+      operationId: putV2EndpointsByEndpointState
+      x-operation-id-source: derived
     delete:
       summary: Delete state items
       description: Remove specified state variables by their keys.
@@ -179,6 +181,8 @@ paths:
                 count: 3
         '401':
           $ref: '#/components/responses/Unauthorized'
+      operationId: deleteV2EndpointsByEndpointState
+      x-operation-id-source: derived
   /v2/endpoints/{endpoint}/state/{type}/{key}:
     get:
       summary: Get a single state item
@@ -224,6 +228,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+      operationId: getV2EndpointsByEndpointStateByTypeByKey
+      x-operation-id-source: derived
     delete:
       summary: Delete a single state item
       description: Delete a specific state item.
@@ -264,10 +270,12 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+      operationId: deleteV2EndpointsByEndpointStateByTypeByKey
+      x-operation-id-source: derived
 components:
   responses:
-    Forbidden:
-      description: Unauthorized - You don't have access to this endpoint.
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
       content:
         application/json:
           schema:
@@ -278,8 +286,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Bad Request - Payload validation failed.
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
       content:
         application/json:
           schema:
@@ -290,23 +298,42 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
+    BadRequest:
+      description: Bad Request - Payload validation failed.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    EndpointName:
-      name: endpoint
-      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
-      in: path
-      required: true
-      schema:
-        type: string
-        default: '{{endpoint}}'
-      example: order-service
   schemas:
+    StateItem:
+      type: object
+      description: A single entry in the endpoint's persistent state store.
+      properties:
+        type:
+          type: string
+          enum:
+          - string
+          - counter
+          - list
+          example: list
+        key:
+          type: string
+          description: The name/identifier of the state variable.
+          example: cart_items
+        value:
+          oneOf:
+          - type: string
+          - type: array
+          - type: integer
+            minimum: 0
+          description: The current value. For lists, this is an array; for strings, this is a string; for counters, this is a non-negative integer.
+          example:
+          - item_1
+          - item_2
+        lastModified:
+          type: number
+          description: Timestamp of the last time the state item was accessed.
+          example: 1738054800000
     Pagination:
       type: object
       description: Standard pagination metadata for list responses.
@@ -360,35 +387,16 @@ components:
                   received:
                     type: string
                     example: '50'
-    StateItem:
-      type: object
-      description: A single entry in the endpoint's persistent state store.
-      properties:
-        type:
-          type: string
-          enum:
-          - string
-          - counter
-          - list
-          example: list
-        key:
-          type: string
-          description: The name/identifier of the state variable.
-          example: cart_items
-        value:
-          oneOf:
-          - type: string
-          - type: array
-          - type: integer
-            minimum: 0
-          description: The current value. For lists, this is an array; for strings, this is a string; for counters, this is a non-negative integer.
-          example:
-          - item_1
-          - item_2
-        lastModified:
-          type: number
-          description: Timestamp of the last time the state item was accessed.
-          example: 1738054800000
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

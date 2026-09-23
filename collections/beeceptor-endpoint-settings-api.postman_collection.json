@@ -1507,7 +1507,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"data\": [\n    {\n      \"id\": \"6979d6d456c8ed5324860496\",\n      \"name\": \"cert-1\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQwIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n      \"expiry\": \"2027-01-28T09:28:50.960Z\",\n      \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n    },\n    {\n      \"id\": \"6979d6d856c8ed53248604a6\",\n      \"name\": \"cert-2\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEnjCCAoYCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQgIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n      \"expiry\": \"2027-01-28T09:28:55.827Z\",\n      \"createdAt\": \"2026-01-28T09:28:56.747Z\"\n    }\n  ]\n}",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"6979d6d456c8ed5324860496\",\n      \"name\": \"cert-1\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"REDACTED_PRIVATE_KEY_EXAMPLE\\n\",\n      \"expiry\": \"2027-01-28T09:28:50.960Z\",\n      \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n    },\n    {\n      \"id\": \"6979d6d856c8ed53248604a6\",\n      \"name\": \"cert-2\",\n      \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEnjCCAoYCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n      \"key\": \"REDACTED_PRIVATE_KEY_EXAMPLE\\n\",\n      \"expiry\": \"2027-01-28T09:28:55.827Z\",\n      \"createdAt\": \"2026-01-28T09:28:56.747Z\"\n    }\n  ]\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
@@ -1701,7 +1701,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"6979d6d456c8ed5324860496\",\n  \"name\": \"cert-1\",\n  \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n  \"key\": \"-----BEGIN PRIVATE KEY-----\\nMIIJQwIBAD... (truncated)\\n-----END PRIVATE KEY-----\\n\",\n  \"expiry\": \"2027-01-28T09:28:50.960Z\",\n  \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n}",
+              "body": "{\n  \"id\": \"6979d6d456c8ed5324860496\",\n  \"name\": \"cert-1\",\n  \"cert\": \"-----BEGIN CERTIFICATE-----\\nMIIEoDCCAogCAQ... (truncated)\\n-----END CERTIFICATE-----\\n\",\n  \"key\": \"REDACTED_PRIVATE_KEY_EXAMPLE\\n\",\n  \"expiry\": \"2027-01-28T09:28:50.960Z\",\n  \"createdAt\": \"2026-01-28T09:28:52.938Z\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },

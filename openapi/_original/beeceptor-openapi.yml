@@ -920,7 +920,7 @@ components:
         key:
           type: string
           description: Private key in PEM format (Redacted in list views).
-          example: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0B...\n-----END PRIVATE KEY-----"
+          example: "REDACTED_PRIVATE_KEY_EXAMPLE"
         expiry:
           type: string
           format: date-time
@@ -3001,13 +3001,13 @@ paths:
                   - id: "6979d6d456c8ed5324860496"
                     name: "cert-1"
                     cert: "-----BEGIN CERTIFICATE-----\nMIIEoDCCAogCAQ... (truncated)\n-----END CERTIFICATE-----\n"
-                    key: "-----BEGIN PRIVATE KEY-----\nMIIJQwIBAD... (truncated)\n-----END PRIVATE KEY-----\n"
+                    key: "REDACTED_PRIVATE_KEY_EXAMPLE\n"
                     expiry: "2027-01-28T09:28:50.960Z"
                     createdAt: "2026-01-28T09:28:52.938Z"
                   - id: "6979d6d856c8ed53248604a6"
                     name: "cert-2"
                     cert: "-----BEGIN CERTIFICATE-----\nMIIEnjCCAoYCAQ... (truncated)\n-----END CERTIFICATE-----\n"
-                    key: "-----BEGIN PRIVATE KEY-----\nMIIJQgIBAD... (truncated)\n-----END PRIVATE KEY-----\n"
+                    key: "REDACTED_PRIVATE_KEY_EXAMPLE\n"
                     expiry: "2027-01-28T09:28:55.827Z"
                     createdAt: "2026-01-28T09:28:56.747Z"
         '401':
@@ -3042,7 +3042,7 @@ paths:
                 id: "6979d6d456c8ed5324860496"
                 name: "cert-1"
                 cert: "-----BEGIN CERTIFICATE-----\nMIIEoDCCAogCAQ... (truncated)\n-----END CERTIFICATE-----\n"
-                key: "-----BEGIN PRIVATE KEY-----\nMIIJQwIBAD... (truncated)\n-----END PRIVATE KEY-----\n"
+                key: "REDACTED_PRIVATE_KEY_EXAMPLE\n"
                 expiry: "2027-01-28T09:28:50.960Z"
                 createdAt: "2026-01-28T09:28:52.938Z"
         '400':
