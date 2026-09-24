@@ -75,8 +75,6 @@ apis:
     url: https://beeceptor.com/docs/
   - type: GettingStarted
     url: https://beeceptor.com/docs/
-  - url: graphql/beeceptor-graphql.md
-    type: GraphQL
 - aid: beeceptor:beeceptor-endpoint-settings-api
   name: Beeceptor Endpoint Settings API
   description: The Endpoint Settings API from Beeceptor — 5 operation(s) for endpoint settings.

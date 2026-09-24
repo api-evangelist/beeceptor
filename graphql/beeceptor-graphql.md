@@ -1,1 +1,0 @@
-# Beeceptor GraphQL API
