@@ -415,58 +415,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    Job:
-      type: object
-      description: Represents an asynchronous background task, such as processing a large API specification file.
-      properties:
-        jobId:
-          type: string
-          description: Unique identifier for tracking the job status.
-          example: job_9876543210
-        type:
-          type: string
-          enum:
-          - oas
-          - wsdl
-          - grpc
-          - graphql
-          description: The type of specification being processed.
-          example: oas
-        status:
-          type: string
-          enum:
-          - QUEUED
-          - PROCESSING
-          - COMPLETED
-          - FAILED
-          description: Current lifecycle state of the job.
-          example: PROCESSING
-        message:
-          type: string
-          description: Detail or error message related to the job's progress.
-          example: Validating OpenAPI specification file.
-        progress:
-          type: integer
-          minimum: 0
-          maximum: 100
-          description: Progress completion percentage.
-          example: 45
-        currentStage:
-          type: string
-          description: The current processing stage (e.g., 'Validating', 'Mapping', 'Generating Rules').
-          example: Mapping
-        result:
-          type: object
-          description: The result data of the job, available upon completion.
-        completedAt:
-          type: string
-          format: date-time
-          description: Timestamp when the job was completed.
-          example: '2026-01-28T10:00:00Z'
-        failedAt:
-          type: string
-          format: date-time
-          description: Timestamp when the job failed.
     EndpointSettings:
       type: object
       description: Configuration settings for the mock endpoint, including security, CORS, and rate limits.
@@ -600,7 +548,7 @@ components:
         key:
           type: string
           description: Private key in PEM format (Redacted in list views).
-          example: 'REDACTED_PRIVATE_KEY_EXAMPLE'
+          example: REDACTED_PRIVATE_KEY_EXAMPLE
         expiry:
           type: string
           format: date-time
@@ -610,6 +558,58 @@ components:
           type: string
           format: date-time
           example: '2026-01-28T10:00:00Z'
+    Job:
+      type: object
+      description: Represents an asynchronous background task, such as processing a large API specification file.
+      properties:
+        jobId:
+          type: string
+          description: Unique identifier for tracking the job status.
+          example: job_9876543210
+        type:
+          type: string
+          enum:
+          - oas
+          - wsdl
+          - grpc
+          - graphql
+          description: The type of specification being processed.
+          example: oas
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - PROCESSING
+          - COMPLETED
+          - FAILED
+          description: Current lifecycle state of the job.
+          example: PROCESSING
+        message:
+          type: string
+          description: Detail or error message related to the job's progress.
+          example: Validating OpenAPI specification file.
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Progress completion percentage.
+          example: 45
+        currentStage:
+          type: string
+          description: The current processing stage (e.g., 'Validating', 'Mapping', 'Generating Rules').
+          example: Mapping
+        result:
+          type: object
+          description: The result data of the job, available upon completion.
+        completedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the job was completed.
+          example: '2026-01-28T10:00:00Z'
+        failedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the job failed.
     Error:
       type: object
       description: Standard error response structure.
@@ -643,37 +643,6 @@ components:
                   received:
                     type: string
                     example: '50'
-  responses:
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthenticated - API key is missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Unauthorized - You don't have access to this endpoint.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not Found - The requested resource does not exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Bad Request - Payload validation failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   parameters:
     EndpointName:
       name: endpoint
@@ -684,6 +653,37 @@ components:
         type: string
         default: '{{endpoint}}'
       example: order-service
+  responses:
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad Request - Payload validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

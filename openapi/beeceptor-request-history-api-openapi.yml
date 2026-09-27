@@ -907,6 +907,53 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    RequestLog:
+      oneOf:
+      - $ref: '#/components/schemas/RequestLogCompact'
+      - $ref: '#/components/schemas/RequestLogVerbose'
+      description: 'An audit log of an incoming request received by the mock server.
+
+
+        The response format depends on the `mode` query parameter:
+
+        - **Default (compact mode)**: Returns basic request information (id, date, method, path, status, timeTaken, rule, behavior)
+
+        - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
+
+        '
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
     RequestLogCompact:
       type: object
       description: Compact request log with basic information only.
@@ -957,69 +1004,6 @@ components:
           - crud
           - grpc
           description: The behavior mode used to handle this request.
-    RequestLog:
-      oneOf:
-      - $ref: '#/components/schemas/RequestLogCompact'
-      - $ref: '#/components/schemas/RequestLogVerbose'
-      description: 'An audit log of an incoming request received by the mock server.
-
-
-        The response format depends on the `mode` query parameter:
-
-        - **Default (compact mode)**: Returns basic request information (id, date, method, path, status, timeTaken, rule, behavior)
-
-        - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
-
-        '
-    PaginationNew:
-      type: object
-      description: Cursor-based pagination metadata for history and state items.
-      properties:
-        cursor:
-          type: string
-          description: The cursor for the next set of results.
-          example: bmV4dF9jdXJzb3JfMTIz
-        hasMore:
-          type: boolean
-          description: Indicates if more records are available.
-          example: true
-        limit:
-          type: integer
-          description: The page size limit used.
-          example: 50
-    Error:
-      type: object
-      description: Standard error response structure.
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              enum:
-              - validation_error
-              - not_found
-              - unauthorized_api_key
-              - missing_authentication
-              - internal_error
-              example: validation_error
-            message:
-              type: string
-              example: Request validation failed
-            details:
-              type: array
-              items:
-                type: object
-                properties:
-                  path:
-                    type: string
-                    example: /rules[0]/action/status
-                  message:
-                    type: string
-                    example: must be greater than or equal to 100
-                  received:
-                    type: string
-                    example: '50'
     RequestLogVerbose:
       allOf:
       - $ref: '#/components/schemas/RequestLogCompact'
@@ -1066,6 +1050,32 @@ components:
               redacted:
                 type: boolean
                 description: True if sensitive fields were redacted from the response.
+    PaginationNew:
+      type: object
+      description: Cursor-based pagination metadata for history and state items.
+      properties:
+        cursor:
+          type: string
+          description: The cursor for the next set of results.
+          example: bmV4dF9jdXJzb3JfMTIz
+        hasMore:
+          type: boolean
+          description: Indicates if more records are available.
+          example: true
+        limit:
+          type: integer
+          description: The page size limit used.
+          example: 50
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
   responses:
     Unauthorized:
       description: Unauthenticated - API key is missing or invalid.
@@ -1079,16 +1089,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    EndpointName:
-      name: endpoint
-      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
-      in: path
-      required: true
-      schema:
-        type: string
-        default: '{{endpoint}}'
-      example: order-service
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

@@ -273,21 +273,31 @@ paths:
       operationId: deleteV2EndpointsByEndpointStateByTypeByKey
       x-operation-id-source: derived
 components:
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
   responses:
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthenticated - API key is missing or invalid.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Unauthorized - You don't have access to this endpoint.
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad Request - Payload validation failed.
       content:
         application/json:
           schema:
@@ -298,8 +308,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Bad Request - Payload validation failed.
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
       content:
         application/json:
           schema:
@@ -334,26 +344,6 @@ components:
           type: number
           description: Timestamp of the last time the state item was accessed.
           example: 1738054800000
-    Pagination:
-      type: object
-      description: Standard pagination metadata for list responses.
-      properties:
-        total:
-          type: number
-          description: Total number of items available across all pages.
-          example: 150
-        limit:
-          type: number
-          description: Maximum number of items requested per page.
-          example: 20
-        offset:
-          type: number
-          description: Number of items skipped from the beginning.
-          example: 0
-        hasMore:
-          type: boolean
-          description: Indicates if another page of data is available.
-          example: true
     Error:
       type: object
       description: Standard error response structure.
@@ -387,16 +377,26 @@ components:
                   received:
                     type: string
                     example: '50'
-  parameters:
-    EndpointName:
-      name: endpoint
-      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
-      in: path
-      required: true
-      schema:
-        type: string
-        default: '{{endpoint}}'
-      example: order-service
+    Pagination:
+      type: object
+      description: Standard pagination metadata for list responses.
+      properties:
+        total:
+          type: number
+          description: Total number of items available across all pages.
+          example: 150
+        limit:
+          type: number
+          description: Maximum number of items requested per page.
+          example: 20
+        offset:
+          type: number
+          description: Number of items skipped from the beginning.
+          example: 0
+        hasMore:
+          type: boolean
+          description: Indicates if another page of data is available.
+          example: true
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
