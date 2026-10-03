@@ -273,29 +273,7 @@ paths:
       operationId: deleteV2EndpointsByEndpointStateByTypeByKey
       x-operation-id-source: derived
 components:
-  parameters:
-    EndpointName:
-      name: endpoint
-      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
-      in: path
-      required: true
-      schema:
-        type: string
-        default: '{{endpoint}}'
-      example: order-service
   responses:
-    Unauthorized:
-      description: Unauthenticated - API key is missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     BadRequest:
       description: Bad Request - Payload validation failed.
       content:
@@ -314,36 +292,49 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
   schemas:
-    StateItem:
+    Pagination:
       type: object
-      description: A single entry in the endpoint's persistent state store.
+      description: Standard pagination metadata for list responses.
       properties:
-        type:
-          type: string
-          enum:
-          - string
-          - counter
-          - list
-          example: list
-        key:
-          type: string
-          description: The name/identifier of the state variable.
-          example: cart_items
-        value:
-          oneOf:
-          - type: string
-          - type: array
-          - type: integer
-            minimum: 0
-          description: The current value. For lists, this is an array; for strings, this is a string; for counters, this is a non-negative integer.
-          example:
-          - item_1
-          - item_2
-        lastModified:
+        total:
           type: number
-          description: Timestamp of the last time the state item was accessed.
-          example: 1738054800000
+          description: Total number of items available across all pages.
+          example: 150
+        limit:
+          type: number
+          description: Maximum number of items requested per page.
+          example: 20
+        offset:
+          type: number
+          description: Number of items skipped from the beginning.
+          example: 0
+        hasMore:
+          type: boolean
+          description: Indicates if another page of data is available.
+          example: true
     Error:
       type: object
       description: Standard error response structure.
@@ -377,26 +368,35 @@ components:
                   received:
                     type: string
                     example: '50'
-    Pagination:
+    StateItem:
       type: object
-      description: Standard pagination metadata for list responses.
+      description: A single entry in the endpoint's persistent state store.
       properties:
-        total:
+        type:
+          type: string
+          enum:
+          - string
+          - counter
+          - list
+          example: list
+        key:
+          type: string
+          description: The name/identifier of the state variable.
+          example: cart_items
+        value:
+          oneOf:
+          - type: string
+          - type: array
+          - type: integer
+            minimum: 0
+          description: The current value. For lists, this is an array; for strings, this is a string; for counters, this is a non-negative integer.
+          example:
+          - item_1
+          - item_2
+        lastModified:
           type: number
-          description: Total number of items available across all pages.
-          example: 150
-        limit:
-          type: number
-          description: Maximum number of items requested per page.
-          example: 20
-        offset:
-          type: number
-          description: Number of items skipped from the beginning.
-          example: 0
-        hasMore:
-          type: boolean
-          description: Indicates if another page of data is available.
-          example: true
+          description: Timestamp of the last time the state item was accessed.
+          example: 1738054800000
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
