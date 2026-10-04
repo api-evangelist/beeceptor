@@ -525,6 +525,39 @@ components:
               type: boolean
               description: Master toggle for the mock rules engine.
               example: true
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
     Certificate:
       type: object
       description: Details of an mTLS client certificate managed within Beeceptor.
@@ -610,42 +643,9 @@ components:
           type: string
           format: date-time
           description: Timestamp when the job failed.
-    Error:
-      type: object
-      description: Standard error response structure.
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              enum:
-              - validation_error
-              - not_found
-              - unauthorized_api_key
-              - missing_authentication
-              - internal_error
-              example: validation_error
-            message:
-              type: string
-              example: Request validation failed
-            details:
-              type: array
-              items:
-                type: object
-                properties:
-                  path:
-                    type: string
-                    example: /rules[0]/action/status
-                  message:
-                    type: string
-                    example: must be greater than or equal to 100
-                  received:
-                    type: string
-                    example: '50'
   responses:
-    BadRequest:
-      description: Bad Request - Payload validation failed.
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
       content:
         application/json:
           schema:
@@ -656,14 +656,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Unauthorized - You don't have access to this endpoint.
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
+    BadRequest:
+      description: Bad Request - Payload validation failed.
       content:
         application/json:
           schema:

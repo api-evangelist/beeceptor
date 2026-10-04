@@ -906,66 +906,23 @@ paths:
       operationId: getV2EndpointsByEndpointRequestsByRequestIdMultipartDownload
       x-operation-id-source: derived
 components:
-  responses:
-    NotFound:
-      description: Not Found - The requested resource does not exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthenticated - API key is missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
-    RequestLogVerbose:
-      allOf:
-      - $ref: '#/components/schemas/RequestLogCompact'
-      - type: object
-        description: Verbose request log with full request and response details.
-        required:
-        - request
-        - response
-        properties:
-          request:
-            type: object
-            description: Full incoming request details.
-            properties:
-              body:
-                type: string
-                nullable: true
-                description: Request body content, or null if no body was sent.
-              headers:
-                type: object
-                additionalProperties:
-                  type: string
-                description: HTTP headers sent in the request.
-              httpVersion:
-                type: string
-                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
-              redacted:
-                type: boolean
-                description: True if sensitive fields were redacted from the request.
-          response:
-            type: object
-            description: Full response details sent back to the client.
-            properties:
-              body:
-                type: string
-                description: Response body content.
-              headers:
-                type: object
-                additionalProperties:
-                  type: string
-                description: HTTP headers sent in the response.
-              httpVersion:
-                type: string
-                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
-              redacted:
-                type: boolean
-                description: True if sensitive fields were redacted from the response.
+    PaginationNew:
+      type: object
+      description: Cursor-based pagination metadata for history and state items.
+      properties:
+        cursor:
+          type: string
+          description: The cursor for the next set of results.
+          example: bmV4dF9jdXJzb3JfMTIz
+        hasMore:
+          type: boolean
+          description: Indicates if more records are available.
+          example: true
+        limit:
+          type: integer
+          description: The page size limit used.
+          example: 50
     RequestLogCompact:
       type: object
       description: Compact request log with basic information only.
@@ -1016,20 +973,52 @@ components:
           - crud
           - grpc
           description: The behavior mode used to handle this request.
-    RequestLog:
-      oneOf:
+    RequestLogVerbose:
+      allOf:
       - $ref: '#/components/schemas/RequestLogCompact'
-      - $ref: '#/components/schemas/RequestLogVerbose'
-      description: 'An audit log of an incoming request received by the mock server.
-
-
-        The response format depends on the `mode` query parameter:
-
-        - **Default (compact mode)**: Returns basic request information (id, date, method, path, status, timeTaken, rule, behavior)
-
-        - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
-
-        '
+      - type: object
+        description: Verbose request log with full request and response details.
+        required:
+        - request
+        - response
+        properties:
+          request:
+            type: object
+            description: Full incoming request details.
+            properties:
+              body:
+                type: string
+                nullable: true
+                description: Request body content, or null if no body was sent.
+              headers:
+                type: object
+                additionalProperties:
+                  type: string
+                description: HTTP headers sent in the request.
+              httpVersion:
+                type: string
+                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
+              redacted:
+                type: boolean
+                description: True if sensitive fields were redacted from the request.
+          response:
+            type: object
+            description: Full response details sent back to the client.
+            properties:
+              body:
+                type: string
+                description: Response body content.
+              headers:
+                type: object
+                additionalProperties:
+                  type: string
+                description: HTTP headers sent in the response.
+              httpVersion:
+                type: string
+                description: HTTP version used (e.g., "HTTP/1.1", "HTTP/2").
+              redacted:
+                type: boolean
+                description: True if sensitive fields were redacted from the response.
     Error:
       type: object
       description: Standard error response structure.
@@ -1063,22 +1052,20 @@ components:
                   received:
                     type: string
                     example: '50'
-    PaginationNew:
-      type: object
-      description: Cursor-based pagination metadata for history and state items.
-      properties:
-        cursor:
-          type: string
-          description: The cursor for the next set of results.
-          example: bmV4dF9jdXJzb3JfMTIz
-        hasMore:
-          type: boolean
-          description: Indicates if more records are available.
-          example: true
-        limit:
-          type: integer
-          description: The page size limit used.
-          example: 50
+    RequestLog:
+      oneOf:
+      - $ref: '#/components/schemas/RequestLogCompact'
+      - $ref: '#/components/schemas/RequestLogVerbose'
+      description: 'An audit log of an incoming request received by the mock server.
+
+
+        The response format depends on the `mode` query parameter:
+
+        - **Default (compact mode)**: Returns basic request information (id, date, method, path, status, timeTaken, rule, behavior)
+
+        - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
+
+        '
   parameters:
     EndpointName:
       name: endpoint
@@ -1089,6 +1076,19 @@ components:
         type: string
         default: '{{endpoint}}'
       example: order-service
+  responses:
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

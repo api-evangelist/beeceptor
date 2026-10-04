@@ -981,280 +981,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    WeightedAction:
-      type: object
-      description: 'Distributes incoming requests across multiple responses based on assigned weights.
-
-        The combined weights of all responses must equal exactly 100.
-
-        '
-      properties:
-        type:
-          type: string
-          enum:
-          - weighted
-          example: weighted
-        responses:
-          type: array
-          description: A list of potential responses and their probability weights.
-          items:
-            $ref: '#/components/schemas/WeightedResponse'
-      required:
-      - type
-      - responses
-    GrpcResponse:
-      type: object
-      properties:
-        body:
-          type: string
-          example: '{"message": "Hello from Beeceptor"}'
-        metadata:
-          type: string
-          example: '{"some-key": "some-value"}'
-    BaseCondition:
-      type: object
-      required:
-      - type
-      properties:
-        type:
-          type: string
-    StateCondition:
-      description: 'Matches against persistent state variables (Counters, Data Stores, or Lists)
-
-        stored in your endpoint. This allows for stateful mock transitions.
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/BaseCondition'
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - state
-            example: state
-          key:
-            type: string
-            description: The name of the state variable.
-            example: login_attempts
-          stateType:
-            type: string
-            enum:
-            - string
-            - counter
-            - list
-            description: '''string'': General key-value store.
-
-              ''counter'': Numeric value supporting math operations.
-
-              ''list'': Collection of values supporting LIFO/FIFO operations.
-
-              '
-            example: counter
-          operator:
-            type: string
-            enum:
-            - equals
-            - not_equals
-            - contains
-            - not_contains
-            - greater_than
-            - less_than
-            - greater_than_equal
-            - less_than_equal
-            example: greater_than
-          value:
-            type: string
-            description: The value to compare the current state against.
-            example: '3'
-        required:
-        - key
-        - stateType
-        - operator
-        - value
-    GrpcAction:
-      type: object
-      description: Defines the mock behavior for gRPC calls, supporting unary and streaming communication.
-      properties:
-        type:
-          type: string
-          enum:
-          - grpc
-          example: grpc
-        callType:
-          type: string
-          enum:
-          - unary
-          - server_streaming
-          - client_streaming
-          - bidirectional_streaming
-          description: gRPC communication pattern.
-          example: unary
-        status:
-          type: number
-          minimum: 0
-          description: Standard gRPC status code (0 for OK, 1-16 for errors).
-          example: 0
-        statusMessage:
-          type: string
-          description: Human-readable status message for gRPC errors, only applicable for non-zero status codes.
-          example: something went wrong
-        delay:
-          type: number
-          minimum: 0
-          maximum: 600000
-          description: Delay before sending the first response in milliseconds.
-          example: 0
-        responses:
-          type: array
-          minItems: 1
-          maxItems: 4
-          description: 'A list of responses to send back. For streaming calls, these are sent sequentially.
-
-            If ''singleResponseRepeated'' is true, only the first response is used for all streams.
-
-            '
-          items:
-            $ref: '#/components/schemas/GrpcResponse'
-        streamCount:
-          type: object
-          description: "For server_streaming or bidirectional patterns, controls how many times \nthe server will push messages before finishing.\n"
-          properties:
-            min:
-              type: number
-              minimum: 1
-              description: Minimum number of stream messages to send.
-              example: 1
-            max:
-              type: number
-              minimum: 1
-              description: Maximum number of stream messages to send.
-              example: 5
-        singleResponseRepeated:
-          type: boolean
-          description: "If true, the server repeats the first response item for the entire duration \nof the stream. If false, you must provide a list of unique responses.\n"
-          example: true
-      required:
-      - type
-      - callType
-      - responses
-    Error:
-      type: object
-      description: Standard error response structure.
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              enum:
-              - validation_error
-              - not_found
-              - unauthorized_api_key
-              - missing_authentication
-              - internal_error
-              example: validation_error
-            message:
-              type: string
-              example: Request validation failed
-            details:
-              type: array
-              items:
-                type: object
-                properties:
-                  path:
-                    type: string
-                    example: /rules[0]/action/status
-                  message:
-                    type: string
-                    example: must be greater than or equal to 100
-                  received:
-                    type: string
-                    example: '50'
-    Action:
-      oneOf:
-      - $ref: '#/components/schemas/MockAction'
-      - $ref: '#/components/schemas/WeightedAction'
-      - $ref: '#/components/schemas/CalloutAction'
-      - $ref: '#/components/schemas/CrudAction'
-      - $ref: '#/components/schemas/GrpcAction'
-      discriminator:
-        propertyName: type
-        mapping:
-          mock: '#/components/schemas/MockAction'
-          weighted: '#/components/schemas/WeightedAction'
-          callout: '#/components/schemas/CalloutAction'
-          crud: '#/components/schemas/CrudAction'
-          grpc: '#/components/schemas/GrpcAction'
-    RuleWithId:
-      description: 'A Rule object that includes a unique identifier, typically returned in responses.
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/Rule'
-      - type: object
-        required:
-        - id
-        properties:
-          id:
-            type: string
-            description: The unique identifier for the rule.
-    HeaderCondition:
-      description: Inspects the value of a specific HTTP header in the incoming request.
-      allOf:
-      - $ref: '#/components/schemas/BaseCondition'
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - header
-            example: header
-          key:
-            type: string
-            description: The name of the HTTP header (e.g., 'User-Agent', 'X-Custom-Header').
-            example: Content-Type
-          operator:
-            type: string
-            enum:
-            - equals
-            - contains
-            - regex
-            description: Matching operator for the header value.
-            example: equals
-          value:
-            type: string
-            description: The expected string, substring, or regular expression pattern.
-            example: application/json
-        required:
-        - key
-        - operator
-        - value
-    GraphQLCondition:
-      description: "Matches against incoming GraphQL queries. Beeceptor parses the GraphQL operation \nname or query structure to determine a match.\n"
-      allOf:
-      - $ref: '#/components/schemas/BaseCondition'
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - graphql
-            example: graphql
-          operator:
-            type: string
-            enum:
-            - equals
-            - contains
-            - regex
-            example: equals
-          value:
-            type: string
-            description: The GraphQL operation name or query snippet to match.
-            example: GetUserEmail
-        required:
-        - operator
-        - value
     SoapActionCondition:
       description: Targets SOAP-based web services by matching against the 'SOAPAction' header.
       allOf:
@@ -1278,195 +1004,19 @@ components:
         required:
         - operator
         - value
-    Rule:
-      type: object
-      description: 'A Rule defines the behavior for an incoming request. It consists of a set of conditions
-
-        and a resulting action. Beeceptor matches requests against rules in the order they are defined.
+    RuleWithId:
+      description: 'A Rule object that includes a unique identifier, typically returned in responses.
 
         '
-      required:
-      - enabled
-      - conditions
-      - action
-      properties:
-        enabled:
-          type: boolean
-          description: Toggle rule on/off. Disabled rules are ignored during matching.
-          example: true
-        method:
-          type: string
-          enum:
-          - GET
-          - POST
-          - PUT
-          - PATCH
-          - DELETE
-          - OPTIONS
-          - TRACE
-          - '*'
-          description: 'The HTTP method to match. Use ''*'' to match any method.
-
-            Note: For CRUD and gRPC rules, this is typically set to ''*''.
-
-            '
-          example: POST
-        description:
-          type: string
-          description: Optional human-readable description for managing rules.
-          example: My simple mock rule
-        conditions:
-          type: array
-          minItems: 1
-          maxItems: 5
-          items:
-            $ref: '#/components/schemas/Condition'
-          description: 'An array of conditions that must all match (AND logic) for the rule to trigger.
-
-            Rules are evaluated in order; the first fully matched rule executes.
-
-            '
-        action:
-          description: The action to perform (e.g., Mock, Proxy, CRUD) when conditions match.
-          allOf:
-          - $ref: '#/components/schemas/Action'
-    GrpcMethodCondition:
-      description: "Primary condition for gRPC rules. Matches the full gRPC method path \n(e.g., 'package.Service/MethodName').\n"
       allOf:
-      - $ref: '#/components/schemas/BaseCondition'
+      - $ref: '#/components/schemas/Rule'
       - type: object
-        properties:
-          type:
-            type: string
-            enum:
-            - grpc_method
-            example: grpc_method
-          value:
-            type: string
-            description: The fully qualified gRPC method name.
-            example: user.UserService/GetUser
         required:
-        - value
-    PathCondition:
-      allOf:
-      - $ref: '#/components/schemas/BaseCondition'
-      - type: object
+        - id
         properties:
-          type:
+          id:
             type: string
-            enum:
-            - path
-            example: path
-          operator:
-            type: string
-            enum:
-            - equals
-            - starts_with
-            - contains
-            - regex
-            - template
-            description: "Matching operator. 'template' allows Express.js-style path syntax \n(e.g., /users/:id) to capture variables.\n"
-            example: equals
-          value:
-            type: string
-            description: The path string or pattern to match against.
-            example: /api/login
-        required:
-        - operator
-        - value
-    Condition:
-      oneOf:
-      - $ref: '#/components/schemas/PathCondition'
-      - $ref: '#/components/schemas/HeaderCondition'
-      - $ref: '#/components/schemas/BodyCondition'
-      - $ref: '#/components/schemas/BodyParamCondition'
-      - $ref: '#/components/schemas/StateCondition'
-      - $ref: '#/components/schemas/GraphQLCondition'
-      - $ref: '#/components/schemas/SoapActionCondition'
-      - $ref: '#/components/schemas/GrpcMethodCondition'
-      discriminator:
-        propertyName: type
-        mapping:
-          path: '#/components/schemas/PathCondition'
-          header: '#/components/schemas/HeaderCondition'
-          body: '#/components/schemas/BodyCondition'
-          body_param: '#/components/schemas/BodyParamCondition'
-          state: '#/components/schemas/StateCondition'
-          graphql: '#/components/schemas/GraphQLCondition'
-          soap_action: '#/components/schemas/SoapActionCondition'
-          grpc_method: '#/components/schemas/GrpcMethodCondition'
-    MockAction:
-      type: object
-      description: Returns a predefined HTTP response to the caller.
-      properties:
-        type:
-          type: string
-          enum:
-          - mock
-          example: mock
-        delay:
-          type: number
-          description: Response delay in milliseconds (0-600,000).
-          minimum: 0
-          maximum: 600000
-          example: 200
-        status:
-          type: number
-          description: HTTP status code to return.
-          minimum: 100
-          maximum: 599
-          example: 200
-        headers:
-          type: array
-          description: Custom HTTP headers to include in the response.
-          items:
-            type: object
-            properties:
-              key:
-                type: string
-                example: Content-Type
-              value:
-                type: string
-                example: application/json
-              templated:
-                type: boolean
-                description: Enable template engine for this header value.
-                example: false
-        templated:
-          type: boolean
-          description: "If enabled, Beeceptor processes the body using its powerful template engine, \nallowing for dynamic response generation and data injection.\n"
-          example: true
-      oneOf:
-      - title: BodyResponse
-        required:
-        - body
-        properties:
-          body:
-            type: string
-            description: 'The response body. Can include Handlebars templates if ''templated'' is true.
-
-              Use this to generate dynamic data like ''{{faker "person.firstName"}}''.
-
-              '
-            example: '{"status": "success", "user": "{{faker \"person.firstName\"}}"}'
-      - title: BlobPathResponse
-        required:
-        - blobPath
-        properties:
-          blobPath:
-            type: string
-            description: 'Reference to a file stored in Beeceptor''s storage.
-
-              Use the `POST /v2/endpoints/{endpoint}/blobs` API to upload files
-
-              and retrieve this path.
-
-              '
-            example: res-body-20260121042538-e53mertosm.json
-      required:
-      - type
-      - status
-      - headers
+            description: The unique identifier for the rule.
     CalloutAction:
       type: object
       description: 'Triggers an external HTTP request (Callout) when the rule matches.
@@ -1587,28 +1137,7 @@ components:
       - type
       - behavior
       - callout
-    CrudAction:
-      type: object
-      description: 'Enables stateful CRUD behavior for a resource path. Beeceptor will automatically
-
-        handle POST (Create), GET (Read), PUT (Update), and DELETE operations for JSON objects.
-
-        '
-      properties:
-        type:
-          type: string
-          enum:
-          - crud
-          example: crud
-        idField:
-          type: string
-          description: The field name in the JSON object used as a unique identifier (e.g., 'id' or 'uuid').
-          example: id
-      required:
-      - type
-      - idField
-    BodyParamCondition:
-      description: "Matches against parsed body parameters. This is applicable for JSON payloads, \nXML, or Form-Data where Beeceptor can extract named fields.\n"
+    PathCondition:
       allOf:
       - $ref: '#/components/schemas/BaseCondition'
       - type: object
@@ -1616,26 +1145,171 @@ components:
           type:
             type: string
             enum:
-            - body_param
-            example: body_param
-          key:
-            type: string
-            description: The key or path to the field in the request body (e.g., 'user.id').
-            example: user.email
+            - path
+            example: path
           operator:
             type: string
             enum:
             - equals
-            - not_equals
+            - starts_with
             - contains
-            - not_contains
-            - is_null
-            - is_not_null
+            - regex
+            - template
+            description: "Matching operator. 'template' allows Express.js-style path syntax \n(e.g., /users/:id) to capture variables.\n"
             example: equals
           value:
             type: string
-            description: The value to compare against. Not required for 'is_null' or 'is_not_null'.
-            example: test@example.com
+            description: The path string or pattern to match against.
+            example: /api/login
+        required:
+        - operator
+        - value
+    WeightedAction:
+      type: object
+      description: 'Distributes incoming requests across multiple responses based on assigned weights.
+
+        The combined weights of all responses must equal exactly 100.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - weighted
+          example: weighted
+        responses:
+          type: array
+          description: A list of potential responses and their probability weights.
+          items:
+            $ref: '#/components/schemas/WeightedResponse'
+      required:
+      - type
+      - responses
+    Condition:
+      oneOf:
+      - $ref: '#/components/schemas/PathCondition'
+      - $ref: '#/components/schemas/HeaderCondition'
+      - $ref: '#/components/schemas/BodyCondition'
+      - $ref: '#/components/schemas/BodyParamCondition'
+      - $ref: '#/components/schemas/StateCondition'
+      - $ref: '#/components/schemas/GraphQLCondition'
+      - $ref: '#/components/schemas/SoapActionCondition'
+      - $ref: '#/components/schemas/GrpcMethodCondition'
+      discriminator:
+        propertyName: type
+        mapping:
+          path: '#/components/schemas/PathCondition'
+          header: '#/components/schemas/HeaderCondition'
+          body: '#/components/schemas/BodyCondition'
+          body_param: '#/components/schemas/BodyParamCondition'
+          state: '#/components/schemas/StateCondition'
+          graphql: '#/components/schemas/GraphQLCondition'
+          soap_action: '#/components/schemas/SoapActionCondition'
+          grpc_method: '#/components/schemas/GrpcMethodCondition'
+    Rule:
+      type: object
+      description: 'A Rule defines the behavior for an incoming request. It consists of a set of conditions
+
+        and a resulting action. Beeceptor matches requests against rules in the order they are defined.
+
+        '
+      required:
+      - enabled
+      - conditions
+      - action
+      properties:
+        enabled:
+          type: boolean
+          description: Toggle rule on/off. Disabled rules are ignored during matching.
+          example: true
+        method:
+          type: string
+          enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+          - TRACE
+          - '*'
+          description: 'The HTTP method to match. Use ''*'' to match any method.
+
+            Note: For CRUD and gRPC rules, this is typically set to ''*''.
+
+            '
+          example: POST
+        description:
+          type: string
+          description: Optional human-readable description for managing rules.
+          example: My simple mock rule
+        conditions:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Condition'
+          description: 'An array of conditions that must all match (AND logic) for the rule to trigger.
+
+            Rules are evaluated in order; the first fully matched rule executes.
+
+            '
+        action:
+          description: The action to perform (e.g., Mock, Proxy, CRUD) when conditions match.
+          allOf:
+          - $ref: '#/components/schemas/Action'
+    GraphQLCondition:
+      description: "Matches against incoming GraphQL queries. Beeceptor parses the GraphQL operation \nname or query structure to determine a match.\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - graphql
+            example: graphql
+          operator:
+            type: string
+            enum:
+            - equals
+            - contains
+            - regex
+            example: equals
+          value:
+            type: string
+            description: The GraphQL operation name or query snippet to match.
+            example: GetUserEmail
+        required:
+        - operator
+        - value
+    HeaderCondition:
+      description: Inspects the value of a specific HTTP header in the incoming request.
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - header
+            example: header
+          key:
+            type: string
+            description: The name of the HTTP header (e.g., 'User-Agent', 'X-Custom-Header').
+            example: Content-Type
+          operator:
+            type: string
+            enum:
+            - equals
+            - contains
+            - regex
+            description: Matching operator for the header value.
+            example: equals
+          value:
+            type: string
+            description: The expected string, substring, or regular expression pattern.
+            example: application/json
         required:
         - key
         - operator
@@ -1665,6 +1339,236 @@ components:
         required:
         - operator
         - value
+    Action:
+      oneOf:
+      - $ref: '#/components/schemas/MockAction'
+      - $ref: '#/components/schemas/WeightedAction'
+      - $ref: '#/components/schemas/CalloutAction'
+      - $ref: '#/components/schemas/CrudAction'
+      - $ref: '#/components/schemas/GrpcAction'
+      discriminator:
+        propertyName: type
+        mapping:
+          mock: '#/components/schemas/MockAction'
+          weighted: '#/components/schemas/WeightedAction'
+          callout: '#/components/schemas/CalloutAction'
+          crud: '#/components/schemas/CrudAction'
+          grpc: '#/components/schemas/GrpcAction'
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
+    BaseCondition:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+    CrudAction:
+      type: object
+      description: 'Enables stateful CRUD behavior for a resource path. Beeceptor will automatically
+
+        handle POST (Create), GET (Read), PUT (Update), and DELETE operations for JSON objects.
+
+        '
+      properties:
+        type:
+          type: string
+          enum:
+          - crud
+          example: crud
+        idField:
+          type: string
+          description: The field name in the JSON object used as a unique identifier (e.g., 'id' or 'uuid').
+          example: id
+      required:
+      - type
+      - idField
+    MockAction:
+      type: object
+      description: Returns a predefined HTTP response to the caller.
+      properties:
+        type:
+          type: string
+          enum:
+          - mock
+          example: mock
+        delay:
+          type: number
+          description: Response delay in milliseconds (0-600,000).
+          minimum: 0
+          maximum: 600000
+          example: 200
+        status:
+          type: number
+          description: HTTP status code to return.
+          minimum: 100
+          maximum: 599
+          example: 200
+        headers:
+          type: array
+          description: Custom HTTP headers to include in the response.
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                example: Content-Type
+              value:
+                type: string
+                example: application/json
+              templated:
+                type: boolean
+                description: Enable template engine for this header value.
+                example: false
+        templated:
+          type: boolean
+          description: "If enabled, Beeceptor processes the body using its powerful template engine, \nallowing for dynamic response generation and data injection.\n"
+          example: true
+      oneOf:
+      - title: BodyResponse
+        required:
+        - body
+        properties:
+          body:
+            type: string
+            description: 'The response body. Can include Handlebars templates if ''templated'' is true.
+
+              Use this to generate dynamic data like ''{{faker "person.firstName"}}''.
+
+              '
+            example: '{"status": "success", "user": "{{faker \"person.firstName\"}}"}'
+      - title: BlobPathResponse
+        required:
+        - blobPath
+        properties:
+          blobPath:
+            type: string
+            description: 'Reference to a file stored in Beeceptor''s storage.
+
+              Use the `POST /v2/endpoints/{endpoint}/blobs` API to upload files
+
+              and retrieve this path.
+
+              '
+            example: res-body-20260121042538-e53mertosm.json
+      required:
+      - type
+      - status
+      - headers
+    GrpcMethodCondition:
+      description: "Primary condition for gRPC rules. Matches the full gRPC method path \n(e.g., 'package.Service/MethodName').\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - grpc_method
+            example: grpc_method
+          value:
+            type: string
+            description: The fully qualified gRPC method name.
+            example: user.UserService/GetUser
+        required:
+        - value
+    GrpcAction:
+      type: object
+      description: Defines the mock behavior for gRPC calls, supporting unary and streaming communication.
+      properties:
+        type:
+          type: string
+          enum:
+          - grpc
+          example: grpc
+        callType:
+          type: string
+          enum:
+          - unary
+          - server_streaming
+          - client_streaming
+          - bidirectional_streaming
+          description: gRPC communication pattern.
+          example: unary
+        status:
+          type: number
+          minimum: 0
+          description: Standard gRPC status code (0 for OK, 1-16 for errors).
+          example: 0
+        statusMessage:
+          type: string
+          description: Human-readable status message for gRPC errors, only applicable for non-zero status codes.
+          example: something went wrong
+        delay:
+          type: number
+          minimum: 0
+          maximum: 600000
+          description: Delay before sending the first response in milliseconds.
+          example: 0
+        responses:
+          type: array
+          minItems: 1
+          maxItems: 4
+          description: 'A list of responses to send back. For streaming calls, these are sent sequentially.
+
+            If ''singleResponseRepeated'' is true, only the first response is used for all streams.
+
+            '
+          items:
+            $ref: '#/components/schemas/GrpcResponse'
+        streamCount:
+          type: object
+          description: "For server_streaming or bidirectional patterns, controls how many times \nthe server will push messages before finishing.\n"
+          properties:
+            min:
+              type: number
+              minimum: 1
+              description: Minimum number of stream messages to send.
+              example: 1
+            max:
+              type: number
+              minimum: 1
+              description: Maximum number of stream messages to send.
+              example: 5
+        singleResponseRepeated:
+          type: boolean
+          description: "If true, the server repeats the first response item for the entire duration \nof the stream. If false, you must provide a list of unique responses.\n"
+          example: true
+      required:
+      - type
+      - callType
+      - responses
     WeightedResponse:
       type: object
       properties:
@@ -1710,6 +1614,102 @@ components:
       - status
       - headers
       - body
+    GrpcResponse:
+      type: object
+      properties:
+        body:
+          type: string
+          example: '{"message": "Hello from Beeceptor"}'
+        metadata:
+          type: string
+          example: '{"some-key": "some-value"}'
+    StateCondition:
+      description: 'Matches against persistent state variables (Counters, Data Stores, or Lists)
+
+        stored in your endpoint. This allows for stateful mock transitions.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - state
+            example: state
+          key:
+            type: string
+            description: The name of the state variable.
+            example: login_attempts
+          stateType:
+            type: string
+            enum:
+            - string
+            - counter
+            - list
+            description: '''string'': General key-value store.
+
+              ''counter'': Numeric value supporting math operations.
+
+              ''list'': Collection of values supporting LIFO/FIFO operations.
+
+              '
+            example: counter
+          operator:
+            type: string
+            enum:
+            - equals
+            - not_equals
+            - contains
+            - not_contains
+            - greater_than
+            - less_than
+            - greater_than_equal
+            - less_than_equal
+            example: greater_than
+          value:
+            type: string
+            description: The value to compare the current state against.
+            example: '3'
+        required:
+        - key
+        - stateType
+        - operator
+        - value
+    BodyParamCondition:
+      description: "Matches against parsed body parameters. This is applicable for JSON payloads, \nXML, or Form-Data where Beeceptor can extract named fields.\n"
+      allOf:
+      - $ref: '#/components/schemas/BaseCondition'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+            - body_param
+            example: body_param
+          key:
+            type: string
+            description: The key or path to the field in the request body (e.g., 'user.id').
+            example: user.email
+          operator:
+            type: string
+            enum:
+            - equals
+            - not_equals
+            - contains
+            - not_contains
+            - is_null
+            - is_not_null
+            example: equals
+          value:
+            type: string
+            description: The value to compare against. Not required for 'is_null' or 'is_not_null'.
+            example: test@example.com
+        required:
+        - key
+        - operator
+        - value
   responses:
     Forbidden:
       description: Unauthorized - You don't have access to this endpoint.
@@ -1723,6 +1723,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthenticated - API key is missing or invalid.
       content:
@@ -1731,12 +1737,6 @@ components:
             $ref: '#/components/schemas/Error'
     BadRequest:
       description: Bad Request - Payload validation failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not Found - The requested resource does not exist.
       content:
         application/json:
           schema:
