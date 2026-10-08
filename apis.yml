@@ -112,6 +112,10 @@ apis:
   - type: OpenAPI
     url: openapi/beeceptor-state-store-api-openapi.yml
 common:
+- type: RateLimits
+  url: rate-limits/beeceptor-rate-limits.yml
+- type: FinOps
+  url: finops/beeceptor-finops.yml
 - type: AgenticAccess
   url: agentic-access/beeceptor-agentic-access.yml
 - type: DomainSecurity
