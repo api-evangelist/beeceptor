@@ -414,7 +414,71 @@ paths:
       operationId: deleteV2EndpointsByEndpointMtlsCertificatesByCertId
       x-operation-id-source: derived
 components:
+  responses:
+    Unauthorized:
+      description: Unauthenticated - API key is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Unauthorized - You don't have access to this endpoint.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: Internal Server Error - An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found - The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad Request - Payload validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      description: Standard error response structure.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - validation_error
+              - not_found
+              - unauthorized_api_key
+              - missing_authentication
+              - internal_error
+              example: validation_error
+            message:
+              type: string
+              example: Request validation failed
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    example: /rules[0]/action/status
+                  message:
+                    type: string
+                    example: must be greater than or equal to 100
+                  received:
+                    type: string
+                    example: '50'
     EndpointSettings:
       type: object
       description: Configuration settings for the mock endpoint, including security, CORS, and rate limits.
@@ -525,72 +589,6 @@ components:
               type: boolean
               description: Master toggle for the mock rules engine.
               example: true
-    Error:
-      type: object
-      description: Standard error response structure.
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-              enum:
-              - validation_error
-              - not_found
-              - unauthorized_api_key
-              - missing_authentication
-              - internal_error
-              example: validation_error
-            message:
-              type: string
-              example: Request validation failed
-            details:
-              type: array
-              items:
-                type: object
-                properties:
-                  path:
-                    type: string
-                    example: /rules[0]/action/status
-                  message:
-                    type: string
-                    example: must be greater than or equal to 100
-                  received:
-                    type: string
-                    example: '50'
-    Certificate:
-      type: object
-      description: Details of an mTLS client certificate managed within Beeceptor.
-      properties:
-        id:
-          type: string
-          description: internal certificate identifier.
-          example: cert_abc123
-        name:
-          type: string
-          description: User-defined label for the certificate.
-          example: My Client Cert
-        cert:
-          type: string
-          description: Public certificate in PEM format.
-          example: '-----BEGIN CERTIFICATE-----
-
-            MIIDDTCCAfWgAwIBAgIJAJ...
-
-            -----END CERTIFICATE-----'
-        key:
-          type: string
-          description: Private key in PEM format (Redacted in list views).
-          example: REDACTED_PRIVATE_KEY_EXAMPLE
-        expiry:
-          type: string
-          format: date-time
-          description: Certificate expiration timestamp.
-          example: '2027-01-28T10:00:00Z'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2026-01-28T10:00:00Z'
     Job:
       type: object
       description: Represents an asynchronous background task, such as processing a large API specification file.
@@ -643,37 +641,39 @@ components:
           type: string
           format: date-time
           description: Timestamp when the job failed.
-  responses:
-    Forbidden:
-      description: Unauthorized - You don't have access to this endpoint.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not Found - The requested resource does not exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    InternalError:
-      description: Internal Server Error - An unexpected error occurred.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Bad Request - Payload validation failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthenticated - API key is missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    Certificate:
+      type: object
+      description: Details of an mTLS client certificate managed within Beeceptor.
+      properties:
+        id:
+          type: string
+          description: internal certificate identifier.
+          example: cert_abc123
+        name:
+          type: string
+          description: User-defined label for the certificate.
+          example: My Client Cert
+        cert:
+          type: string
+          description: Public certificate in PEM format.
+          example: '-----BEGIN CERTIFICATE-----
+
+            MIIDDTCCAfWgAwIBAgIJAJ...
+
+            -----END CERTIFICATE-----'
+        key:
+          type: string
+          description: Private key in PEM format (Redacted in list views).
+          example: REDACTED_PRIVATE_KEY_EXAMPLE
+        expiry:
+          type: string
+          format: date-time
+          description: Certificate expiration timestamp.
+          example: '2027-01-28T10:00:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-01-28T10:00:00Z'
   parameters:
     EndpointName:
       name: endpoint

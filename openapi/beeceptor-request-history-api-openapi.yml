@@ -907,72 +907,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    PaginationNew:
-      type: object
-      description: Cursor-based pagination metadata for history and state items.
-      properties:
-        cursor:
-          type: string
-          description: The cursor for the next set of results.
-          example: bmV4dF9jdXJzb3JfMTIz
-        hasMore:
-          type: boolean
-          description: Indicates if more records are available.
-          example: true
-        limit:
-          type: integer
-          description: The page size limit used.
-          example: 50
-    RequestLogCompact:
-      type: object
-      description: Compact request log with basic information only.
-      required:
-      - id
-      - date
-      - method
-      - path
-      - status
-      - timeTaken
-      - rule
-      - behavior
-      properties:
-        id:
-          type: string
-          description: Unique request identifier.
-        date:
-          type: string
-          format: date-time
-          description: Timestamp when the request was received.
-        method:
-          type: string
-          description: HTTP method used (e.g., GET, POST, PUT, DELETE, PATCH, OPTIONS).
-        path:
-          type: string
-          description: Full request path including query parameters.
-        status:
-          type: integer
-          description: HTTP response status code returned by Beeceptor.
-        timeTaken:
-          type: integer
-          description: Processing time in milliseconds.
-        rule:
-          type: object
-          description: Rule matching information.
-          properties:
-            matched:
-              type: boolean
-              description: True if the request matched a user-defined mock rule.
-            ruleId:
-              type: string
-              description: The identifier of the matching rule. Present only when matched is true.
-        behavior:
-          type: string
-          enum:
-          - mock-rule
-          - proxy
-          - crud
-          - grpc
-          description: The behavior mode used to handle this request.
     RequestLogVerbose:
       allOf:
       - $ref: '#/components/schemas/RequestLogCompact'
@@ -1066,16 +1000,72 @@ components:
         - **Verbose mode** (when `mode=verbose` or fetching a specific request): Includes full request and response details with headers and body content.
 
         '
-  parameters:
-    EndpointName:
-      name: endpoint
-      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
-      in: path
-      required: true
-      schema:
-        type: string
-        default: '{{endpoint}}'
-      example: order-service
+    PaginationNew:
+      type: object
+      description: Cursor-based pagination metadata for history and state items.
+      properties:
+        cursor:
+          type: string
+          description: The cursor for the next set of results.
+          example: bmV4dF9jdXJzb3JfMTIz
+        hasMore:
+          type: boolean
+          description: Indicates if more records are available.
+          example: true
+        limit:
+          type: integer
+          description: The page size limit used.
+          example: 50
+    RequestLogCompact:
+      type: object
+      description: Compact request log with basic information only.
+      required:
+      - id
+      - date
+      - method
+      - path
+      - status
+      - timeTaken
+      - rule
+      - behavior
+      properties:
+        id:
+          type: string
+          description: Unique request identifier.
+        date:
+          type: string
+          format: date-time
+          description: Timestamp when the request was received.
+        method:
+          type: string
+          description: HTTP method used (e.g., GET, POST, PUT, DELETE, PATCH, OPTIONS).
+        path:
+          type: string
+          description: Full request path including query parameters.
+        status:
+          type: integer
+          description: HTTP response status code returned by Beeceptor.
+        timeTaken:
+          type: integer
+          description: Processing time in milliseconds.
+        rule:
+          type: object
+          description: Rule matching information.
+          properties:
+            matched:
+              type: boolean
+              description: True if the request matched a user-defined mock rule.
+            ruleId:
+              type: string
+              description: The identifier of the matching rule. Present only when matched is true.
+        behavior:
+          type: string
+          enum:
+          - mock-rule
+          - proxy
+          - crud
+          - grpc
+          description: The behavior mode used to handle this request.
   responses:
     Unauthorized:
       description: Unauthenticated - API key is missing or invalid.
@@ -1089,6 +1079,16 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  parameters:
+    EndpointName:
+      name: endpoint
+      description: The name of Beeceptor endpoint. E.g., you should pick `my-endpoint` from your mock server base URL `https://my-endpoint.proxy.beeceptor.com`)
+      in: path
+      required: true
+      schema:
+        type: string
+        default: '{{endpoint}}'
+      example: order-service
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
