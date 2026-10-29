@@ -1,4 +1,4 @@
-# Beeceptor (beeceptor)
+# Beeceptor
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,72 +66,140 @@
 
 Beeceptor is an API mocking, HTTP debugging, and proxy platform that lets developers create mock servers instantly without any coding. It supports REST, SOAP, GraphQL, and gRPC mocking, provides real-time HTTP traffic inspection, webhook testing, local tunneling, and AI-powered spec generation. Teams use Beeceptor to unblock frontend, backend, and QA workflows by simulating APIs before they are built or while avoiding dependencies on live services.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/beeceptor/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/beeceptor/refs/heads/main/apis.yml)
+**Areas:** API Mocking · Automation · Debugging · HTTP Proxy · Integration · Mock Servers · Platform · Testing · Webhook
 
-## Scope
+## Beeceptor on APIs.io
 
-- **Type:** Index
-- **Position:** Consumer
-- **Access:** 3rd-Party
+Everything profiled for Beeceptor is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/beeceptor/](https://apis.io/providers/beeceptor/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (5)
 
-- API Mocking
-- Automation
-- Debugging
-- HTTP Proxy
-- Integrations
-- Mock Servers
-- Platform
-- Testing
-- Webhooks
+- [Beeceptor API](https://apis.io/apis/beeceptor/beeceptor/) — Beeceptor's management API provides programmatic access to create and manage mock endpoints, rules, and traffic inspection on Scale and Enterprise plans. It…
+- [Beeceptor Endpoint Settings API](https://apis.io/apis/beeceptor/beeceptor-endpoint-settings-api/) — The Endpoint Settings API from Beeceptor — 5 operation(s) for endpoint settings.
+- [Beeceptor Mock Rules API](https://apis.io/apis/beeceptor/beeceptor-mock-rules-api/) — The Mock Rules API from Beeceptor — 4 operation(s) for mock rules.
+- [Beeceptor Request History API](https://apis.io/apis/beeceptor/beeceptor-request-history-api/) — The Request History API from Beeceptor — 3 operation(s) for request history.
+- [Beeceptor State Store API](https://apis.io/apis/beeceptor/beeceptor-state-store-api/) — The State Store API from Beeceptor — 2 operation(s) for state store.
 
-## Timestamps
+### Published properties
 
-- **Created:** 2025-01-08
-- **Modified:** 2026-05-04
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### GraphQL (1)
 
-### Beeceptor API
+GraphQL schemas.
 
-Beeceptor's management API provides programmatic access to create and manage mock endpoints, rules, and traffic inspection on Scale and Enterprise plans. It enables teams to automate mock server provisioning, configure request matching rules, and integrate Beeceptor into CI/CD pipelines.
+- [Moved to /providers/beeceptor/](https://apis.io/graphqls/beeceptor/beeceptor-graphql/)
 
-- **Human URL:** [https://beeceptor.com/](https://beeceptor.com/)
+#### MCP servers (1)
 
-#### Tags
+Model Context Protocol servers that expose the API to agents.
 
-- API Mocking
-- HTTP Proxy
-- Mock Servers
-- Testing
+- [beeceptor](https://apis.io/servers/beeceptor/beeceptor/)
 
-#### Properties
+#### Agentic access (1)
 
-- [Documentation](https://beeceptor.com/docs/)
-- [API Reference](https://beeceptor.com/docs/)
-- [Getting Started](https://beeceptor.com/docs/)
-- [Postman Collection](collections/beeceptor.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/beeceptor.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+Which operations an agent can call, which act, and which need a human in the loop.
 
-## Common Properties
+- [Beeceptor Agentic Access](https://apis.io/agentic-access/beeceptor/beeceptor-agentic-access/)
 
-- [LinkedIn](https://www.linkedin.com/company/beeceptor)
+#### Collections (5)
+
+Postman and Open Collection request collections.
+
+- [Beeceptor API](https://apis.io/collections/beeceptor/open-beeceptor/)
+- [Beeceptor Endpoint Settings API](https://apis.io/collections/beeceptor/open-beeceptor-endpoint-settings-api/)
+- [Beeceptor Endpoint Settings Mock Rules API](https://apis.io/collections/beeceptor/open-beeceptor-mock-rules-api/)
+- [Beeceptor Endpoint Settings Request History API](https://apis.io/collections/beeceptor/open-beeceptor-request-history-api/)
+- [Beeceptor Endpoint Settings State Store API](https://apis.io/collections/beeceptor/open-beeceptor-state-store-api/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Beeceptor Authentication](https://apis.io/security/beeceptor/beeceptor-authentication/)
+- [Beeceptor Domain Security](https://apis.io/security/beeceptor/beeceptor-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Beeceptor Plans Pricing](https://apis.io/plans/beeceptor/beeceptor-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Beeceptor Rate Limits](https://apis.io/rate-limits/beeceptor/beeceptor-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Beeceptor Finops](https://apis.io/finops/beeceptor/beeceptor-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
 - [Website](https://beeceptor.com)
-- [Portal](https://app.beeceptor.com)
 - [Pricing](https://beeceptor.com/pricing/)
-- [F A Q](https://beeceptor.com/faq/)
 - [Blog](https://beeceptor.com/blog/)
-- [Status Page](https://beeceptorstatus.statuspage.io)
-- [Privacy Policy](https://beeceptor.com/privacy-policy/)
-- [Terms of Service](https://beeceptor.com/terms-of-service/)
-- [GitHub Organization](https://github.com/beeceptor)
-- [Features](undefined)
-- [Plans](undefined)
-- [Use Cases](undefined)
-- [Integrations](undefined)
+- [Terms of service](https://beeceptor.com/terms-of-service/)
+- [Privacy policy](https://beeceptor.com/privacy-policy/)
+- [GitHub](https://github.com/beeceptor)
+- [Status](https://beeceptorstatus.statuspage.io)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 36.2** — thin · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 60.0 |
+| Contract quality | 51.7 |
+| Contract governance | 0.0 |
+| Operational transparency | 23.7 |
+| Developer ergonomics | 50.0 |
+| Access clarity | 15.8 |
+
+**Agent readiness 40.7** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 11.8** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/beeceptor/](https://apis.io/providers/beeceptor/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Beeceptor: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/beeceptor/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
